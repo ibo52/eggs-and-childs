@@ -34,45 +34,52 @@ void showEggList(char* a){
 }
 int
 main(int argc, char *argv[ ]) {
-  	//shared mem-----------------------yumurta için
+  	//shared mem----------------------- for placing eggs
   	key_t shmkey=ftok(".",'x');
   	int shmid;char *memBuff,*eggHolder;int holderLength=10;
+  	
+  	//create shared memory location with shmkey
   	if ((shmid=shmget(shmkey,holderLength,IPC_CREAT|0660))< 0) {
     	perror("shmget fail");
     	return 1;
    }
+   //attach the char array to that shared memory location
 	if ((memBuff = (char *)shmat(shmid, 0, 0)) == (char *) -1) {
     	perror("shmat : parent");
     	return 2;
    }
-   eggHolder=memBuff;
+   eggHolder=memBuff;//char array for accessing egg holder
    int i;
+   
   	for(i=0;i<holderLength;i++){
   		*(eggHolder+i) ='_';
   	}
-  //shared mem--------------yumurta için  
+  	//shared mem----------------------- for placing eggs
   
-	static struct sembuf acquire = {0, -1, SEM_UNDO},//semafor eriş
-                       release = {0,  1, SEM_UNDO};//semafor bırak
+	static struct sembuf acquire = {0, -1, SEM_UNDO},//acces semaphore values
+                       release = {0,  1, SEM_UNDO};//release semaphore values
 	pid_t           c_pid;
 	key_t           ipc_key;
-  	static unsigned short   semaphores_start_val[2] = {1, 0};//2 semafor initial value
+  	static unsigned short   semaphores_start_val[2] = {1, 0};//means chicken access first and place some egg as semafor initial value
   	int             semid, producer = 0, n, p_sleep, c_sleep;
   	union semun     arg;
-  	enum { PUT, EAT };//accesses-> put==sem0, eat==sem1
+  	enum { PUT, EAT };//values-> put==change sem->0, sem->1
   	if (argc != 2) {
     	cerr << argv[0] <<  " sleep_time" << endl;
     return 1;
   }
   
   	ipc_key = ftok(".", 'S');
+  	//create semaphore with ipc_key
   	if ((semid=semget(ipc_key, 2, IPC_CREAT|IPC_EXCL|0660)) != -1) {
   		producer = 1;
     	arg.array = semaphores_start_val;
+    //set the initial values of sempahore
     if (semctl(semid, 0, SETALL, arg) == -1) {
     	perror("semctl -- producer -- initialization");
     	return 2;
     }
+    //if you are consumer; access the semaphore location to use later
   } else if ((semid = semget(ipc_key, 2, 0)) == -1) {
     	perror("semget -- consumer -- obtaining semaphore");
     	return 3;
@@ -81,7 +88,8 @@ main(int argc, char *argv[ ]) {
   
 	
   	cout<<"init holder: "<<memBuff<<endl;
-  	srand( time(0) ); //sayının gelişigüzel olması için random fonksiyonunu anlık zamanla besledik
+  	srand( time(0) ); //seed the random function with current time to obtain arbitrary random values
+  	
 	switch (producer) {
   		case 1:{
   			p_sleep = atoi(argv[1]);
@@ -93,7 +101,7 @@ main(int argc, char *argv[ ]) {
   			nEggs+=eggs;
   			cout<<"chickens gave "<<eggs<<" eggs"<<endl;
   		
-  			acquire.sem_num=PUT;
+  			acquire.sem_num=PUT;//try to access semaphore
   			if( semop(semid,&acquire,1)==-1 ){
   				perror("semop acquire:");
   			}
@@ -105,28 +113,31 @@ main(int argc, char *argv[ ]) {
   					nEggs--;
   				}
   				else{
-  					cout<<"yer kalmadı.bekleyen "<<nEggs<<"yumurta var"<<endl;
+  					cout<<"No space.There is"<<nEggs<<" to be placed"<<endl;
   					break;}
   			}
   					
-  			cout<<"eggs placed. "<<nEggs<<" waiting to be placed"<<endl;
+  			cout<<"some eggs placed.There is"<<nEggs<<" to be placed"<<endl;
   			cout<<"holder: "<<memBuff<<endl;
   			sleep(p_sleep);
-  			release.sem_num=EAT;
+  			release.sem_num=EAT;//release semaphore for others to access
   			if( semop(semid,&release,1)==-1 ){
   				perror("semop acquire:");
   			}
-  			//sleep(p_sleep);
+  			
   			}
   			if (semctl(semid, 0, IPC_RMID, 0) == -1) {
       			perror("semctl -- producer");
       			return 7;
     		}
+    		
+    		//program finished. Close shared resources
     		cout << "Semaphore removed" << endl;
     		shmdt(memBuff);
      		shmctl(shmid, IPC_RMID, (struct shmid_ds *) 0);
      		cout<<"shared mem removed"<<endl;
   			break;}
+  		
   		case 0:{
   			int c_idx=0;
   			c_sleep = atoi(argv[1]);
@@ -140,7 +151,7 @@ main(int argc, char *argv[ ]) {
   					perror("child acquire:");return 8;
   				}
   				
-  				cout<<"child wanna eat "<<willEat<<" eggs+ "<<eated<<" from before.looks the egg holder"<<endl;
+  				cout<<"child wants to eat "<<willEat<<" eggs + "<<eated<<" from before.looks the egg holder"<<endl;
   				cout<<"holder: "<<memBuff<<endl;
   				eated+=willEat;
   				for(int f=c_idx;f<c_idx+eated;f++){
@@ -150,13 +161,13 @@ main(int argc, char *argv[ ]) {
   						eated--;
   					}
   					else{
-  					cout<<"yemeye yumurta yok."<<endl;break;}
+  					cout<<"There is no eggs to eat."<<endl;break;}
   				}
   				cout<<"child eated "<<willEat-eated<<" eggs and gone:"<<endl;
   				cout<<"holder: "<<memBuff<<endl;
   				sleep(c_sleep);
   				
-  				release.sem_num=PUT;
+  				release.sem_num=PUT;//release semaphore
   				if( semop(semid,&release,1)==-1 ){
   					perror("child release:");return 10;
   				}
