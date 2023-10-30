@@ -1,8 +1,30 @@
+#Inter Process communication Problems 
+## Simple TCP/UDP Server/Client programs for socket programming on POSIX.
+
+- C programs that maintains Inter process communication on localhost
+  * Object oriented programming concepts applied to be able to understand OOAD better
+  * sockets communication implemented to be able to understand IPC better
+
+## Objects
+### Server.c
+- Defines object 'Server'
+- Server is base class for TCPServer and UDPServer.
+- Holds the socket information
+
+### TCPServer.c and TCPClient.c
+- Defines objects 'TCPServer' and 'TCPClient'
+- Maintains connection oriented communication
+
+### UDPServer.c and UDPClient.c
+- Defines objects 'UDPServer' and 'UDPClient'
+- Maintains connectionless communication
+
+***
+
 # Shared resources problems.
-- Setted on Ubuntu GNU/Linux system.
+## Simple Consumer-Producer problem on shared memory.
 * eggs-and-childs.cxx
   * _compile: `g++ eggs-and-childs.cxx`_
-  * Producer-consumer problem on shared resources.
   * Uses semaphores,ipc,shared-mem for solution,(UNIX defined)
   * _open two terminals and run the file on two terminal respectively.
   first one will be the chicken which fill the resource,
@@ -10,8 +32,10 @@ second one will be the childs which empty the resource._
 
 * PhoneOperator.c
   * _compile: `gcc PhoneOperator.c -pthread`_
-  * sharing problem on restricted-shared sources
+  * sharing problem on restricted-shared resources
   * Uses threads and semaphores for solution(POSIX defined)
+
+***
 
 # Threading problem: matrix calc
 - programmed on java(openjdk-8 based, openjdk-11).
