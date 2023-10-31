@@ -60,13 +60,3 @@ void tcp_client__start(TCPClient* self){
 	
 	close(self->server_fd);
 }
-
-// Driver Program
-int main (int argc, char** argv){
-	TCPClient* cli=tcp_client__new(INADDR_LOOPBACK, TCP_PORT);
-	tcp_client__start(cli);
-	
-	tcp_client__destroy(&cli);
-	return 0;
-}
-

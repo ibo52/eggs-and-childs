@@ -52,13 +52,3 @@ void udp_server__start(UDPServer* self){
        (addr>>24&0xff), (addr>>16&0xff), (addr>>8&0xff), addr&0xff);
 	
 }
-
-int main(int argc, char** argv){
-	UDPServer* server=udp_server__new(INADDR_ANY, UDP_PORT);
-	udp_server__start(server);
-	
-	udp_server__destroy(&server);
-	
-	return 0;
-}
-

@@ -110,15 +110,3 @@ static void* tcp_server__starter_task(void* argument){
     pthread_exit(NULL);
 	
 }
-
-// Driver Program
-int main (int argc, char** argv){
-	TCPServer* server=tcp_server__new(INADDR_LOOPBACK, TCP_PORT);
-    tcp_server__start(server);
-    
-    tcp_server__join(server);
-    tcp_server__destroy(&server);
-    
-	return 0;
-}
-

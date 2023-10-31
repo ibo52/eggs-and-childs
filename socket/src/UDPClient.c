@@ -49,26 +49,3 @@ void udp_client__destroy(UDPClient** self){
 	
 	printf("UDPClient object destructed\n");
 }
-
-int main(int argc, char** argv){
-	
-	UDPClient* requester=udp_client__new(INADDR_ANY, UDP_PORT);
-
-   strcpy((char *)requester->send_buff->buffer, "Hello from UDP client.");
-
-   /* Send the message in buf to the server */
-   if (sendto(requester->server_fd, requester->send_buff->buffer, strlen((char* )requester->send_buff->buffer), 0,
-                 (struct sockaddr *)&requester->server, sizeof(requester->server)) < 0)
-   {
-       perror("sendto()");
-       exit(2);
-   }
-
-   /* Deallocate the socket */
-   close(requester->server_fd);
-   
-   udp_client__destroy(&requester);
-   
-   return 0;
-}
-
