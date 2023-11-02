@@ -14,13 +14,14 @@
 #include<pthread.h>
 
 #include "TCPServer.h"
-#include "Server.h"
+#include "Socket.h"
 
 // Driver Program
 int main (int argc, char** argv){
 	TCPServer* server=tcp_server__new(INADDR_LOOPBACK, TCP_PORT);
     tcp_server__start(server);
     
+    printf("TCP Server started. Waiting for a connection.\n");
     tcp_server__join(server);
     tcp_server__destroy(&server);
     

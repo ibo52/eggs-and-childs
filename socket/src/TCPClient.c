@@ -8,30 +8,22 @@
 #include<string.h>
 
 #include "TCPClient.h"
+#include "Socket.h"
 
 TCPClient* tcp_client__new(int addr, int port){
+
+	Socket* super = socket__new(addr, port, CONN_TYPE_TCP_CLIENT );
+	
 	TCPClient* self=calloc(1, sizeof(TCPClient));
 	
-	self->recv_buff=sock_util__alloc_buffer(1024);
-	self->send_buff=sock_util__alloc_buffer(1024);
-	
-	//initialize object
-	//open server socket
-	if ( (self->server_fd=socket(AF_INET, SOCK_STREAM, 0))<0){
-        perror("socket could not intialized");
-        exit(errno);
-    }
-    
-	self->server.sin_family = AF_INET;
-    self->server.sin_port   = htons(port);
-    self->server.sin_addr.s_addr = htonl(addr);
+	self->super=super;
 	
 	return self;
 }
 
 void tcp_client__destroy(TCPClient** self){
-	sock_util__dealloc_buffer( &( (*self)->recv_buff) );
-	sock_util__dealloc_buffer( &( (*self)->send_buff ) );
+
+	socket__destroy( &((*self)->super) );
 	
 	free( (*self) );
 	self=NULL;
@@ -40,7 +32,7 @@ void tcp_client__destroy(TCPClient** self){
 
 void tcp_client__start(TCPClient* self){
 	//connect to server
-	if( connect(self->server_fd, (struct sockaddr*)&self->server, sizeof(self->server))<0 ){
+	if( connect(self->super->fd, (struct sockaddr*)&self->super->socket, sizeof(self->super->socket))<0 ){
         perror("Socket could not connect to server struct");
         exit(errno);
     }
@@ -48,15 +40,13 @@ void tcp_client__start(TCPClient* self){
     int i;
 	for(i=0; i<1; i++){
 		int /*recv_size=0,*/ send_size=0;
-		strcpy((char* )self->send_buff->buffer,"hello from client");
+		strcpy((char* )self->super->send_buff->buffer,"hello from client");
 
-		send_size=sock_util__send(self->server_fd, self->send_buff, strlen((char*)self->send_buff->buffer) );
+		send_size=sock_util__send(self->super->fd, self->super->send_buff, strlen((char*)self->super->send_buff->buffer) );
 		
-    	fprintf(stdout,"sent:%i bytes of %s\n", send_size, self->send_buff->buffer);
+    	fprintf(stdout,"sent:%i bytes of %s\n", send_size, self->super->send_buff->buffer);
     	
-    	sock_util__receive(self->server_fd, self->recv_buff, self->recv_buff->size);
-    	fprintf(stdout,"incoming from server: %s\n", self->recv_buff->buffer);
+    	sock_util__receive(self->super->fd, self->super->recv_buff, self->super->recv_buff->size);
+    	fprintf(stdout,"incoming from server: %s\n", self->super->recv_buff->buffer);
 	}
-	
-	close(self->server_fd);
 }

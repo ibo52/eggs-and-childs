@@ -18,19 +18,19 @@
 int main(int argc, char** argv){
 	
 	UDPClient* requester=udp_client__new(INADDR_ANY, UDP_PORT);
-
-   strcpy((char *)requester->send_buff->buffer, "Hello from UDP client.");
+    printf("UDP Client starting to send message to the connection.\n");
+   strcpy((char *)requester->super->send_buff->buffer, "Hello from UDP client.");
 
    /* Send the message in buf to the server */
-   if (sendto(requester->server_fd, requester->send_buff->buffer, strlen((char* )requester->send_buff->buffer), 0,
-                 (struct sockaddr *)&requester->server, sizeof(requester->server)) < 0)
+   if (sendto(requester->super->fd, requester->super->send_buff->buffer, strlen((char* )requester->super->send_buff->buffer), 0,
+                 (struct sockaddr *)&requester->super->socket, sizeof(requester->super->socket)) < 0)
    {
        perror("sendto()");
        exit(2);
    }
 
    /* Deallocate the socket */
-   close(requester->server_fd);
+   close(requester->super->fd);
    
    udp_client__destroy(&requester);
    

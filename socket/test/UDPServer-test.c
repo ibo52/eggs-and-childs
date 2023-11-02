@@ -10,12 +10,14 @@
 
 #include "socket-util.h"
 #include "UDPServer.h"
-#include "Server.h"
+#include "Socket.h"
 
 //Driver program
 int main(int argc, char** argv){
 	UDPServer* server=udp_server__new(INADDR_ANY, UDP_PORT);
 	udp_server__start(server);
+	
+	printf("UDP Server started. Waiting for a connection.\n");
 	
 	udp_server__destroy(&server);
 	

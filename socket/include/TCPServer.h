@@ -5,7 +5,7 @@
 #include "socket-util.h"
 
 typedef struct __TCPServer{
-	Server* super;
+	Socket* super;
 	pthread_t starter_thread;
 }TCPServer;
 

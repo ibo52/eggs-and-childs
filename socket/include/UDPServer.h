@@ -5,7 +5,7 @@
 
 /*message buffer to use on socket communication*/
 typedef struct __UDPServer{
-	Server* super;
+	Socket* super;
 }UDPServer;
 
 UDPServer* udp_server__new(int address, int port);

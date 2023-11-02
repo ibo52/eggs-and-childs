@@ -16,32 +16,19 @@
 
 
 UDPClient* udp_client__new(int address, int port){
+
+	Socket* super = socket__new(address, port, CONN_TYPE_UDP_CLIENT );
+	
 	UDPClient* self=calloc(1, sizeof(UDPClient));
 	
-	self->recv_buff=sock_util__alloc_buffer(1024);
-	self->send_buff=sock_util__alloc_buffer(1024);
-	
-	/* Create a datagram socket in the internet domain and use the
-    * default protocol (UDP).
-    */
-   if ((self->server_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
-   {
-       perror("socket fd could not bound");
-       exit(self->server_fd);
-   }
-   
-   /* Set up the server name */
-   self->server.sin_family      = AF_INET;            /* Internet Domain    */
-   self->server.sin_port        = htons(port);               /* Server Port        */
-   self->server.sin_addr.s_addr = htonl(address); /* Server's Address   */
+	self->super=super;
 	
 	return self;
 }
 
 void udp_client__destroy(UDPClient** self){
 
-	sock_util__dealloc_buffer( &( (*self)->recv_buff ) );
-	sock_util__dealloc_buffer( &( (*self)->send_buff ) );	
+	socket__destroy( &((*self)->super) );	
 	
 	free( (*self) );
 	

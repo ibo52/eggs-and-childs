@@ -5,10 +5,7 @@
 #include "socket-util.h"
 
 typedef struct __TCPClient{
-	int server_fd;
-	struct sockaddr_in server;
-	dataBuffer *recv_buff;
-	dataBuffer *send_buff;
+	Socket* super;
 }TCPClient;
 
 /*

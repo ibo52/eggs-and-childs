@@ -59,7 +59,7 @@ int sock_util__receive(intptr_t client_fd, dataBuffer* buffer_offset,uint32_t le
 	return recv_retval;
 }
 
-int sock_util__receive__server(Server* self, int client_fd){
+int sock_util__receive__server(Socket* self, int client_fd){
 	/*
 	@param client_fd	: file descriptor of client to receive data from
 	@param buffer_offset: buffer of byte to store received bytes
@@ -99,7 +99,7 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer_offset, uint32_t leng
 	return sent_size;
 }
 
-int sock_util__send__server(Server* self, int client_fd){
+int sock_util__send__server(Socket* self, int client_fd){
 	/*
 	@param client_fd	: file descriptor of client to receive data from
 	@param buffer_offset: buffer of byte to read bytes to send

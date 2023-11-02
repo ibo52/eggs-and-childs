@@ -14,7 +14,7 @@
 #include<pthread.h>
 
 #include "TCPServer.h"
-#include "Server.h"
+#include "Socket.h"
 //---thread functions--------------------
 static void* client_handler(void* argument);
 static void* tcp_server__starter_task(void* argument);
@@ -22,7 +22,7 @@ static void* tcp_server__starter_task(void* argument);
 
 TCPServer* tcp_server__new(int addr, int port){
 
-	Server* super = server__new(addr, port, CONN_TYPE_TCP );
+	Socket* super = socket__new(addr, port, CONN_TYPE_TCP_SERVER );
 	
 	TCPServer* self=calloc(1, sizeof(TCPServer));
 	self->super=super;
@@ -33,7 +33,7 @@ TCPServer* tcp_server__new(int addr, int port){
 void tcp_server__destroy(TCPServer** self){
 	
 	//(*self)->super->vtable->destroy( (*self)->super );
-	
+	socket__destroy( &((*self)->super) );
 	free( (*self) );
 	(*self)=NULL;
 	printf("TCPServer object destructed\n");
@@ -66,7 +66,7 @@ static void* client_handler(void* argument){
 	socklen_t client_len=sizeof(client);
 	int client_fd;
     //accept incoming connection
-    if( ( client_fd = accept(self->super->server_fd, (struct sockaddr*)&client, &client_len) )<0 ){
+    if( ( client_fd = accept(self->super->fd, (struct sockaddr*)&client, &client_len) )<0 ){
         perror("Error while accepting incoming connection");
         exit(errno);
     }
@@ -99,7 +99,7 @@ static void* tcp_server__starter_task(void* argument){
 
 	TCPServer* self=argument;
 	
-	if( listen(self->super->server_fd, MAX_ALLOWED_CONN)<0 ){
+	if( listen(self->super->fd, MAX_ALLOWED_CONN)<0 ){
         perror("Error while listening for incoming connections");
         exit(errno);
     }

@@ -12,6 +12,8 @@
 // Driver Program
 int main (int argc, char** argv){
 	TCPClient* cli=tcp_client__new(INADDR_LOOPBACK, TCP_PORT);
+	
+	printf("TCP Client starting to send a message to the connection.\n");
 	tcp_client__start(cli);
 	
 	tcp_client__destroy(&cli);

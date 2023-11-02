@@ -2,29 +2,27 @@
 #define HALO_SOCKET_UTILS
 
 #include<stdint.h>
+#include "Socket.h"
 
 #define MAX_ALLOWED_CONN 1
 #define TCP_PORT 50004 
 #define UDP_PORT 50005 
 
-#define CONN_TYPE_TCP 0
-#define CONN_TYPE_UDP 1
+#define CONN_TYPE_TCP_SERVER 0
+#define CONN_TYPE_UDP_SERVER 1
+
+#define CONN_TYPE_TCP_CLIENT 2
+#define CONN_TYPE_UDP_CLIENT 3
 /*
 *
 */
+typedef struct __Socket Socket;//forward declaration to Server.h
+
 /*message buffer to use on socket communication*/
 typedef struct __dataBuffer{
 	int8_t* buffer;		//buffer to hold data
 	uint32_t size;		//maximum size of buffer
 }dataBuffer;//message buffer to use on socket communication
-
-typedef struct __Server{
-	int server_fd;
-	struct sockaddr_in server;
-	
-	dataBuffer *recv_buff;
-	dataBuffer *send_buff;
-}Server;
 /*
 	@param size: size of the buffer
 	Allocate buffer of bytes to use through sockets
@@ -56,6 +54,6 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer,uint32_t length);
 /*
 *
 */
-int sock_util__receive__server(Server* self, int fd);
-int sock_util__send__server(Server* self, int fd);
+int sock_util__receive__server(Socket* self, int fd);
+int sock_util__send__server(Socket* self, int fd);
 #endif
