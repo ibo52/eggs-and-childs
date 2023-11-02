@@ -1,28 +1,16 @@
-#Inter Process communication Problems 
-## Simple TCP/UDP Server/Client programs for socket programming on POSIX.
+# Inter Process communication Problems 
+## Data sharing between processess
+### Simple TCP/UDP Server/Client programs for _socket_ programming on POSIX.
 
 - C programs that maintains Inter process communication on localhost
+	* _compile: `clear && make`_
   * Object oriented programming concepts applied to be able to understand OOAD better
-  * sockets communication implemented to be able to understand IPC better
-
-## Objects
-### Server.c
-- Defines object 'Server'
-- Server is base class for TCPServer and UDPServer.
-- Holds the socket information
-
-### TCPServer.c and TCPClient.c
-- Defines objects 'TCPServer' and 'TCPClient'
-- Maintains connection oriented communication
-
-### UDPServer.c and UDPClient.c
-- Defines objects 'UDPServer' and 'UDPClient'
-- Maintains connectionless communication
+  * socket communication implemented to be able to understand IPC better
 
 ***
 
-# Shared resources problems.
-## Simple Consumer-Producer problem on shared memory.
+## Shared resources problems.
+### Simple Consumer-Producer problem on _shared memory_.
 * eggs-and-childs.cxx
   * _compile: `g++ eggs-and-childs.cxx`_
   * Uses semaphores,ipc,shared-mem for solution,(UNIX defined)
@@ -30,14 +18,15 @@
   first one will be the chicken which fill the resource,
 second one will be the childs which empty the resource._
 
+### Simple _access_ problem on restricted resources
 * PhoneOperator.c
   * _compile: `gcc PhoneOperator.c -pthread`_
-  * sharing problem on restricted-shared resources
+  * sharing common data between threads
   * Uses threads and semaphores for solution(POSIX defined)
 
 ***
 
-# Threading problem: matrix calc
+# _Threading_ problem: matrix calc
 - programmed on java(openjdk-8 based, openjdk-11).
   * _compile: `javac MatrixMultiplication.java`_
   * _run:      `java MatrixMultiplication`_
