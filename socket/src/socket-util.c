@@ -39,6 +39,7 @@ void sock_util__dealloc_buffer(dataBuffer** buffer){
 	(*buffer)=NULL;
 }
 /*
+*	Interface for connection oriented (TCP) socket structs
 *	Read from socket file descriptor, and store data read
 */
 int sock_util__receive(intptr_t client_fd, dataBuffer* buffer_offset,uint32_t length){
@@ -59,24 +60,11 @@ int sock_util__receive(intptr_t client_fd, dataBuffer* buffer_offset,uint32_t le
 	return recv_retval;
 }
 
-int sock_util__receive__server(Socket* self, int client_fd){
-	/*
-	@param client_fd	: file descriptor of client to receive data from
-	@param buffer_offset: buffer of byte to store received bytes
-	@param length		: data length to store to buffer(offset). Should not exceed maximum length of buffer
-	@return				: Bytes received in total
-	*/
-	
-		int recv_retval;//total received size of message from procedure call 
-		if( (recv_retval= recv(client_fd, self->recv_buff->buffer , self->recv_buff->size, 0)) <0 ){
-			perror("Error while receiving from socket");
-			exit(recv_retval);
-		
-		}
-	
-	return recv_retval;
-}
 
+/*
+*	Interface for connection oriented (TCP) socket structs
+*	write to socket file descriptor, and send data
+*/
 int sock_util__send(intptr_t client_fd, dataBuffer* buffer_offset, uint32_t length){
 	/*
 	@param client_fd	: file descriptor of client to receive data from
@@ -99,26 +87,49 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer_offset, uint32_t leng
 	return sent_size;
 }
 
-int sock_util__send__server(Socket* self, int client_fd){
+
+dataBuffer sock_util__send__socket(Socket* self){
 	/*
-	@param client_fd	: file descriptor of client to receive data from
-	@param buffer_offset: buffer of byte to read bytes to send
-	@param length		: data length to send from buffer(offset). Should not exceed maximum length of buffer
-	@return				: Bytes sent in total
+	@param self	: sender Socket to forward message to other
+	@return		: Bytes sent in total
 	*/
 	int sent_size=0;
 	int length=strlen((char *)self->send_buff->buffer);
+	struct sockaddr_in client;	//recvfrom will fill this struct destination socket
+	socklen_t client_len=sizeof(client);
 	
 	while( sent_size < length ){
 	
 		int size;
-		
-		if( (size = send(client_fd, self->send_buff->buffer + sent_size, length, 0)) <0 ){
-			fprintf(stderr, "Error while sending to socket(Totally %i bytes sent)\n",sent_size);
+	
+		if( (size = sendto(self->fd, self->send_buff->buffer + sent_size, length, 0, (struct sockaddr *)&client, client_len)) <0 ){
+			fprintf(stderr, "Error while sending to socket(Totally %i bytes sent): %s\n",sent_size, strerror(errno));
 			exit(errno);
 		}
 		sent_size+=size;
 	}//will break safely if equal to 0; will exit if<0
 	printf("sent %i bytes of %s\n",sent_size, (char*)self->send_buff->buffer);
-	return sent_size;
+	
+	dataBuffer retData={NULL, sent_size};
+	return retData;
+}
+
+dataBuffer sock_util__receive__socket(Socket* self){
+	/*
+	@param self: Socket to listen for a message receivation from others
+	@return	   : Bytes received in total
+	*/
+	
+		int recv_retval;			//total received size of message from procedure call 
+		struct sockaddr_in client;	//recvfrom will fill this struct
+		socklen_t client_address_size = sizeof(client);
+			
+		if( (recv_retval= recvfrom(self->fd, self->recv_buff->buffer , self->recv_buff->size, 0, (struct sockaddr *)&client, &client_address_size)) <0 ){
+			perror("Error while receiving from socket");
+			exit(recv_retval);
+		
+		}
+	
+	dataBuffer retData={(int8_t*)&client, recv_retval};
+	return retData;
 }

@@ -31,11 +31,6 @@ void tcp_client__destroy(TCPClient** self){
 }
 
 void tcp_client__start(TCPClient* self){
-	//connect to server
-	if( connect(self->super->fd, (struct sockaddr*)&self->super->socket, sizeof(self->super->socket))<0 ){
-        perror("Socket could not connect to server struct");
-        exit(errno);
-    }
     
     int i;
 	for(i=0; i<1; i++){

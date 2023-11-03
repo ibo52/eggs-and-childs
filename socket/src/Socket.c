@@ -39,10 +39,19 @@ Socket* socket__new(int addr, int port, int type){
 			
 		default:
 			errno=EINVAL;
-			perror("wrong parameter for connection type(udp and tcp are supported)");
+			perror("wrong parameter for connection type(UDP/TCP server/client are supported)");
 	}
+    
+	/* Set up the server name */
+	self->socket.sin_family      = AF_INET;            /* Internet Domain    */
+	self->socket.sin_port        = htons(port);               /* Server Port        */
+	self->socket.sin_addr.s_addr = htonl(addr); 		  /* Server's Address   */
 	
-	switch (type){
+	self->recv_buff=sock_util__alloc_buffer(1024);
+	self->send_buff=sock_util__alloc_buffer(1024);
+    
+    //if it is client struct, connect client to server
+    switch (type){
 		case CONN_TYPE_UDP_CLIENT:
 			if ( connect(self->fd, (struct sockaddr*)&self->socket, sizeof(self->socket))<0){
 				perror("datagram socket could not connect");
@@ -60,16 +69,7 @@ Socket* socket__new(int addr, int port, int type){
 		default:
 			break;
 	}
-    
-	/* Set up the server name */
-	self->socket.sin_family      = AF_INET;            /* Internet Domain    */
-	self->socket.sin_port        = htons(port);               /* Server Port        */
-	self->socket.sin_addr.s_addr = htonl(addr); 		  /* Server's Address   */
-	
-	self->recv_buff=sock_util__alloc_buffer(1024);
-	self->send_buff=sock_util__alloc_buffer(1024);
-    
-    //bind server to network interface
+	//if it is server struct, bind to network interface
     if( type==CONN_TYPE_UDP_SERVER || type==CONN_TYPE_TCP_SERVER){
 		int bind_retval=bind(self->fd, (struct sockaddr*)&(self->socket), sizeof(self->socket));
 		if( bind_retval<0 ){

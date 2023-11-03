@@ -6,10 +6,10 @@
   2. sockets communication implemented to be able to understand IPC better
 
 ## Objects
-### Socket.c
-- Defines object 'Socket'
-- Socket is base class for TCP/UDP Server/Client files.
-- Holds the socket information for communication
+### Server.c
+- Defines object 'Server'
+- Server is base class for TCPServer and UDPServer.
+- Holds the socket information
 
 ### TCPServer.c and TCPClient.c
 - Defines objects 'TCPServer' and 'TCPClient'

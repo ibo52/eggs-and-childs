@@ -34,21 +34,4 @@ void udp_server__destroy(UDPServer** self){
 }
 
 void udp_server__start(UDPServer* self){
-
-	struct sockaddr_in client;
-	socklen_t client_address_size = sizeof(client);
-
-   if(recvfrom(self->super->fd, self->super->recv_buff->buffer, self->super->recv_buff->size, 0, (struct sockaddr *) &client, &client_address_size) <0){
-       perror("recvfrom()");
-       exit(4);
-   }
-   
-   int addr=client.sin_addr.s_addr;
-   printf("Received message %s from domain %s port %d internet\
- address %i.%i.%i.%i\n",
-       self->super->recv_buff->buffer,
-       (client.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
-       ntohs(client.sin_port),
-       (addr>>24&0xff), (addr>>16&0xff), (addr>>8&0xff), addr&0xff);
-	
 }
