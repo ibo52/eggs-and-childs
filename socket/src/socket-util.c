@@ -95,7 +95,7 @@ dataBuffer sock_util__send__socket(Socket* self){
 	*/
 	int sent_size=0;
 	int length=strlen((char *)self->send_buff->buffer);
-	struct sockaddr_in client;	//recvfrom will fill this struct destination socket
+	struct sockaddr_in client=self->socket;	//recvfrom will fill this struct destination socket
 	socklen_t client_len=sizeof(client);
 	
 	while( sent_size < length ){

@@ -13,25 +13,23 @@
 #include "Socket.h"
 
 static void start(UDPServer* self){
-
+	//recv.buffer: holds *(struct sockaddr_in*) socket data of incoming request,
+	//recv.size	 : holds received message length)
 	dataBuffer recvd=sock_util__receive__socket(self->super);
-	printf("Received (%i bytes) message: %s\n", recvd.size, self->super->recv_buff->buffer);
+
+	//to communicate with socket that reach server
+	Socket client={ self->super->fd, *(struct sockaddr_in*)recvd.buffer,self->super->recv_buff, self->super->send_buff };
+
+	int addr=client.socket.sin_addr.s_addr;
+	printf("Received (%i bytes) message: %s | Domain:%s address:%i.%i.%i.%i\n",recvd.size, self->super->recv_buff->buffer, (client.socket.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
+	(addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);	
 	
+	//prepare acknowledgement data to send back
 	strcpy((char*)self->super->send_buff->buffer, (char*)self->super->recv_buff->buffer);
 	strcat((char*)self->super->send_buff->buffer, "ACKNOWLEDGED.");
 	
-	dataBuffer sent=sock_util__send__socket(self->super);
-	printf("Sent (%i bytes) message: %s\n", sent.size, self->super->recv_buff->buffer);
-	
-	/*
-   int addr=client.sin_addr.s_addr;
-   printf("Received message %s from domain %s port %d internet\
- address %i.%i.%i.%i\n",
-       self->super->recv_buff->buffer,
-       (client.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
-       ntohs(client.sin_port),
-       (addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);*/
-	
+	dataBuffer sent=sock_util__send__socket(&client);
+	printf("Sent (%i bytes) message: %s\n", sent.size, self->super->send_buff->buffer);
 }
 
 //Driver program
