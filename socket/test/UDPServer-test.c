@@ -21,6 +21,7 @@ static void start(UDPServer* self){
 	Socket client={ self->super->fd, *(struct sockaddr_in*)recvd.buffer,self->super->recv_buff, self->super->send_buff };
 
 	int addr=client.socket.sin_addr.s_addr;
+	
 	printf("Received (%i bytes) message: %s | Domain:%s address:%i.%i.%i.%i\n",recvd.size, self->super->recv_buff->buffer, (client.socket.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
 	(addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);	
 	
