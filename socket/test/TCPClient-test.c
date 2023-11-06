@@ -14,13 +14,15 @@ static void start(TCPClient* self){
     int i;
 	for(i=0; i<1; i++){
 
-		strcpy((char* )self->super->send_buff->buffer,"hello from client");
+		sock_util__buffer_write(self->super->send_buff,"hello from TCP client");
 
-		sock_util__send__socket( self->super );
-    	//fprintf(stdout,"sent:%i bytes of %s\n", send_size, self->super->send_buff->buffer);
+		dataBuffer sent=sock_util__send__socket( self->super );
+    	//int sent=sock_util__send(self->super->fd, self->super->send_buff, self->super->recv_buff->size );
+    	
+    	printf("Sent:%i bytes of %s\n", sent.size, self->super->send_buff->buffer);
     	
     	dataBuffer recv=sock_util__receive__socket( self->super );
-    	fprintf(stdout,"incoming (%i bytes)from server: %s\n", recv.size, self->super->recv_buff->buffer);
+    	printf("Incoming (%i bytes)from server: %s\n", recv.size, self->super->recv_buff->buffer);
 	}
 }
 

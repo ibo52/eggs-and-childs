@@ -26,8 +26,8 @@ static void start(UDPServer* self){
 	(addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);	
 	
 	//prepare acknowledgement data to send back
-	strcpy((char*)self->super->send_buff->buffer, (char*)self->super->recv_buff->buffer);
-	strcat((char*)self->super->send_buff->buffer, "ACKNOWLEDGED.");
+	sock_util__buffer_write(self->super->send_buff, (char*)self->super->recv_buff->buffer);
+	sock_util__buffer_append(self->super->send_buff, "ACKNOWLEDGED.");
 	
 	dataBuffer sent=sock_util__send__socket(&client);
 	printf("Sent (%i bytes) message: %s\n", sent.size, self->super->send_buff->buffer);

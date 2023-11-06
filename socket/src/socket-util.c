@@ -20,8 +20,9 @@ dataBuffer* sock_util__alloc_buffer(uint32_t size){//to allocate dataBuffer stru
 	*/
 	dataBuffer* b= (dataBuffer*)calloc(1, sizeof(dataBuffer));
 	
-	b->buffer=(int8_t*)calloc(size, sizeof(int8_t));
-	b->size=size;
+	b->buffer = calloc(size+1, sizeof(int8_t));
+	b->size=0;
+	b->max_size=size;
 	
 	return b;
 }
@@ -94,7 +95,8 @@ dataBuffer sock_util__send__socket(Socket* self){
 	@return		: Bytes sent in total
 	*/
 	int sent_size=0;
-	int length=strlen((char *)self->send_buff->buffer);
+	int length=self->send_buff->size;
+
 	struct sockaddr_in client=self->socket;	//recvfrom will fill this struct destination socket
 	socklen_t client_len=sizeof(client);
 	
@@ -108,8 +110,8 @@ dataBuffer sock_util__send__socket(Socket* self){
 		}
 		sent_size+=size;
 	}//will break safely if equal to 0; will exit if<0
-	printf("sent %i bytes of %s\n",sent_size, (char*)self->send_buff->buffer);
-	
+	//printf("sent %i bytes of %s\n",sent_size, (char*)self->send_buff->buffer);
+	self->send_buff->size=sent_size;
 	dataBuffer retData={NULL, sent_size};
 	return retData;
 }
@@ -124,12 +126,52 @@ dataBuffer sock_util__receive__socket(Socket* self){
 		struct sockaddr_in client;	//recvfrom will fill this struct
 		socklen_t client_address_size = sizeof(client);
 			
-		if( (recv_retval= recvfrom(self->fd, self->recv_buff->buffer , self->recv_buff->size, 0, (struct sockaddr *)&client, &client_address_size)) <0 ){
+		if( (recv_retval= recvfrom(self->fd, self->recv_buff->buffer , self->recv_buff->max_size, 0, (struct sockaddr *)&client, &client_address_size)) <0 ){
 			perror("Error while receiving from socket");
 			exit(recv_retval);
 		
 		}
+		
+	self->recv_buff->size=recv_retval;
 	
 	dataBuffer retData={(int8_t*)&client, recv_retval};
 	return retData;
+}
+
+void sock_util__buffer_write(dataBuffer* buff, const char* string){
+	/*
+	*	Write string 	data to dataBuffer
+	*
+	*	@param buff		: 	dataBuffer object to write string data
+	*	@param string	: 	data to be written to buffer
+	*	@return	   		: 
+	*/
+	strncpy((char* )buff->buffer, string, buff->max_size);
+	buff->size = strlen((char* )buff->buffer);
+}
+
+
+void sock_util__buffer_append(dataBuffer* buff, const char* string){
+	/*
+	*	append string to end of data on dataBuffer
+	*
+	*	@param buff		: 	dataBuffer object to append string data
+	*	@param string	: 	data to be appended to buffer
+	*	@return	   		:
+	*/
+	uint32_t n=buff->max_size - buff->size;
+	strncat((char* )buff->buffer, string , n);
+	
+	buff->size = strlen((char* )buff->buffer);
+}
+
+
+const char* sock_util__buffer_get(dataBuffer* buff){
+	/*
+	*	return data on buffer as string
+	*
+	*	@param buff: 	dataBuffer object to get string data
+	*	@return	   : 	buffer as string
+	*/
+	return (char*)buff->buffer;
 }

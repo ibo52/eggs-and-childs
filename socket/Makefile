@@ -1,10 +1,9 @@
 .PHONY=all remove info
 
 TARGET=info
-all:info makedirs compile
-
+all:info makedirs compile_test
 CC=gcc
-CLIBS=-lc
+CLIBS=-lc -ljpeg
 CFLAGS= -Wall -ggdb3
 
 PROGRAM_ROOT_DIR=bin
@@ -35,7 +34,7 @@ info:
 	@ echo "\t\t $(CYAN_COLOR)Inter-process communication"
 	@ echo "\t\t$(INFO_COLOR)======================$(RESET_COLOR)\n"
 
-compile:
+compile_test:
 	@ echo "$(INFO_COLOR)compiling.."
 	@ echo "===Test files===================$(RESET_COLOR)"
 	@ for var in $(TEST_FILES); do \

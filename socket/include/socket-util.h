@@ -4,6 +4,8 @@
 #include<stdint.h>
 #include "Socket.h"
 
+#define DATA_BUFF_DEFAULT_SIZE 1024
+
 #define MAX_ALLOWED_CONN 1
 #define TCP_PORT 50004 
 #define UDP_PORT 50005 
@@ -22,7 +24,8 @@ typedef struct __Socket Socket;//forward declaration to Server.h
 /*message buffer to use on socket communication*/
 typedef struct __dataBuffer{
 	int8_t* buffer;		//buffer to hold data
-	uint32_t size;		//maximum size of buffer
+	uint32_t size;		//written data size of buffer
+	uint32_t max_size;	//maximum size of buffer
 }dataBuffer;//message buffer to use on socket communication
 
 
@@ -80,4 +83,32 @@ dataBuffer sock_util__send__socket(Socket* self);
 *	@return	   : Bytes received in total
 */
 dataBuffer sock_util__receive__socket(Socket* self);
+
+
+/*
+*	Write string 	data to dataBuffer
+*
+*	@param buff: 	dataBuffer object to write string data
+*	@param string: 	data to be written to buffer
+*	@return	   : 	Bytes written in total
+*/
+void sock_util__buffer_write(dataBuffer* buff, const char* string);
+
+
+/*
+*	append string to end of data on dataBuffer
+*
+*	@param buff		: 	dataBuffer object to append string data
+*	@param string	: 	data to be appended to buffer
+*	@return	   		:
+*/	
+void sock_util__buffer_append(dataBuffer* buff, const char* string);
+/*
+*	return data on buffer as string
+*
+*	@param buff: 	dataBuffer object to get string data
+*	@return	   : 	buffer as string
+*/
+const char* sock_util__buffer_get(dataBuffer* buff);
+
 #endif
