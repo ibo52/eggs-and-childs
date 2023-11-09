@@ -31,17 +31,4 @@ void tcp_client__destroy(TCPClient** self){
 }
 
 void tcp_client__start(TCPClient* self){
-    
-    int i;
-	for(i=0; i<1; i++){
-		int /*recv_size=0,*/ send_size=0;
-		strcpy((char* )self->super->send_buff->buffer,"hello from client");
-
-		send_size=sock_util__send(self->super->fd, self->super->send_buff, strlen((char*)self->super->send_buff->buffer) );
-		
-    	fprintf(stdout,"sent:%i bytes of %s\n", send_size, self->super->send_buff->buffer);
-    	
-    	sock_util__receive(self->super->fd, self->super->recv_buff, self->super->recv_buff->size);
-    	fprintf(stdout,"incoming from server: %s\n", self->super->recv_buff->buffer);
-	}
 }

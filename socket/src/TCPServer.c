@@ -78,15 +78,16 @@ static void* client_handler(void* argument){
     for(i=0; i<1; i++){
 		//int recv_size=0, send_size=0;
     	
-    	int recv_size=sock_util__receive(client_fd, self->super->recv_buff, self->super->recv_buff->max_size);
+    	int recv_size=sock_util__receive(client_fd, self->super->recv_buff);
     	
     	//sock_util__receive__socket(self->super);
     	
-    	fprintf(stdout, "incoming (%i bytes) from client: %s\n", recv_size, self->super->recv_buff->buffer);
+    	fprintf(stdout, "incoming (%i bytes) from client: %s\n", recv_size, (char*)self->super->recv_buff->buffer);
     	
-    	strcat((char*)self->super->recv_buff->buffer, " ACKNOWLEDGED.");
+    	sock_util__buffer_append(self->super->send_buff, (char*)self->super->recv_buff->buffer);
+    	sock_util__buffer_append(self->super->send_buff, " ACKNOWLEDGED.");
     	
-    	sock_util__send(client_fd, self->super->recv_buff, strlen((char*)self->super->recv_buff->buffer));
+    	sock_util__send(client_fd, self->super->send_buff);
     	
     	//sock_util__send__socket(self->super);
     	//strcpy((char*)self->send_buff->buffer, (char*)self->recv_buff->buffer);
