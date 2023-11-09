@@ -20,17 +20,19 @@ static void start(UDPClient* self){
 
    /* Send the message in buf to the server */
    dataBuffer sent=sock_util__send__socket(self->super);
-	printf("Sent (%i bytes) message: %s\n", sent.size, self->super->send_buff->buffer);
+	printf("Sent (%i bytes) message: %s\n", sent.size, (char*)self->super->send_buff->buffer);
    
    //wait for a message from server
    dataBuffer recvd=sock_util__receive__socket(self->super);
+   printf("Received dataBuffer: size:%i max size:%i buffer*:%p\n",recvd.size, recvd.max_size, recvd.buffer);
    /*
    *
    */
    int addr=self->super->socket.sin_addr.s_addr;
 	
-	printf("Received (%i bytes) message: %s | Domain:%s address:%i.%i.%i.%i\n",recvd.size, self->super->recv_buff->buffer, (self->super->socket.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
+	printf("Received (%i bytes) message: %s | Domain:%s address:%i.%i.%i.%i\n",recvd.size, (char*)self->super->recv_buff->buffer, (self->super->socket.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
 	(addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);
+	free(recvd.buffer);
 }
 
 int main(int argc, char** argv){

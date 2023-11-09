@@ -18,19 +18,21 @@ static void start(UDPServer* self){
 	dataBuffer recvd=sock_util__receive__socket(self->super);
 
 	//to communicate with socket that reach server
-	Socket client={ self->super->fd, *(struct sockaddr_in*)recvd.buffer,self->super->recv_buff, self->super->send_buff };
+	Socket client={ self->super->fd, *(struct sockaddr_in *)recvd.buffer, self->super->recv_buff, self->super->send_buff };
 
 	int addr=client.socket.sin_addr.s_addr;
 	
-	printf("Received (%i bytes) message: %s | Domain:%s address:%i.%i.%i.%i\n",recvd.size, self->super->recv_buff->buffer, (client.socket.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
+	printf("Received (%i bytes) message: %s | Domain:%s address:%i.%i.%i.%i\n",recvd.size, (char*)self->super->recv_buff->buffer, (client.socket.sin_family == AF_INET?"AF_INET":"UNKNOWN"),
 	(addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);	
 	
 	//prepare acknowledgement data to send back
-	sock_util__buffer_write(self->super->send_buff, (char*)self->super->recv_buff->buffer);
-	sock_util__buffer_append(self->super->send_buff, "ACKNOWLEDGED.");
+	sock_util__buffer_write(client.send_buff, (char*)self->super->recv_buff->buffer);
+	sock_util__buffer_append(client.send_buff, "ACKNOWLEDGED.");
 	
 	dataBuffer sent=sock_util__send__socket(&client);
-	printf("Sent (%i bytes) message: %s\n", sent.size, self->super->send_buff->buffer);
+	printf("Sent (%i bytes) message: %s\n", sent.size, (char*)client.send_buff->buffer);
+	
+	free(recvd.buffer);
 }
 
 //Driver program
