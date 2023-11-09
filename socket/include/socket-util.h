@@ -23,7 +23,7 @@ typedef struct __Socket Socket;//forward declaration to Server.h
 
 /*message buffer to use on socket communication*/
 typedef struct __dataBuffer{
-	int8_t* buffer;		//buffer to hold data
+	void* buffer;		//buffer to hold ADDRESS of data
 	uint32_t size;		//written data size of buffer
 	uint32_t max_size;	//maximum size of buffer
 }dataBuffer;//message buffer to use on socket communication
@@ -49,10 +49,9 @@ void sock_util__dealloc_buffer(dataBuffer** buffer);
 *
 *	@param client_fd	: file descriptor of client to receive data from
 *	@param buffer		: buffer to store received bytes
-*	@param length		: maximum store length to fill buffer
 *	@return				: Bytes received in total
 */
-int sock_util__receive(intptr_t client_fd, dataBuffer* buffer,uint32_t length);
+int sock_util__receive(intptr_t client_fd, dataBuffer* buffer);
 
 
 /*
@@ -61,10 +60,9 @@ int sock_util__receive(intptr_t client_fd, dataBuffer* buffer,uint32_t length);
 *
 *	@param client_fd	: file descriptor of client to receive data from
 *	@param buffer		: buffer to read bytes to send
-*	@param length		: maximum read length of buffer
 *	@return				: Bytes sent in total
 */
-int sock_util__send(intptr_t client_fd, dataBuffer* buffer,uint32_t length);
+int sock_util__send(intptr_t client_fd, dataBuffer* buffer);
 
 
 /*
