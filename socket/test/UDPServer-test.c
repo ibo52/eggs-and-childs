@@ -15,7 +15,7 @@
 static void start(UDPServer* self){
 	//recv.buffer: holds *(struct sockaddr_in*) socket data of incoming request,
 	//recv.size	 : holds received message length)
-	dataBuffer recvd=sock_util__receive__socket(self->super);
+	dataBuffer recvd=self->vtable->receive(self->super);//sock_util__receive__socket(self->super);
 
 	//to communicate with socket that reach server
 	Socket client={ self->super->fd, *(struct sockaddr_in *)recvd.buffer, self->super->recv_buff, self->super->send_buff };
@@ -29,7 +29,7 @@ static void start(UDPServer* self){
 	sock_util__buffer_write(client.send_buff, (char*)self->super->recv_buff->buffer);
 	sock_util__buffer_append(client.send_buff, "ACKNOWLEDGED.");
 	
-	dataBuffer sent=sock_util__send__socket(&client);
+	dataBuffer sent=self->vtable->send(&client);//sock_util__send__socket(&client);
 	printf("Sent (%i bytes) message: %s\n", sent.size, (char*)client.send_buff->buffer);
 	
 	free(recvd.buffer);

@@ -19,6 +19,7 @@ UDPServer* udp_server__new(int addr, int port){
 	UDPServer* self=calloc(1, sizeof(UDPServer));
 	self->super=super;
 	
+	self->vtable=&UDPServer_VTable__default;
 	return self;
 }
 
