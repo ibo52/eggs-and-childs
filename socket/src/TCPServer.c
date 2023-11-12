@@ -26,7 +26,8 @@ TCPServer* tcp_server__new(int addr, int port){
 	
 	TCPServer* self=calloc(1, sizeof(TCPServer));
 	self->super=super;
-
+	
+	self->vtable=&TCPServer_VTable__default;//bind default virtual table
 	return self;
 }
 
