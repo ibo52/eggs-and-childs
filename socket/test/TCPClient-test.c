@@ -16,12 +16,12 @@ static void start(TCPClient* self){
 
 		sock_util__buffer_write(self->super->send_buff,"hello from TCP client");
 
-		dataBuffer sent=sock_util__send__socket( self->super );
+		dataBuffer sent=self->vtable->send( self->super );
     	//int sent=sock_util__send(self->super->fd, self->super->send_buff, self->super->recv_buff->size );
     	
     	printf("Sent:%i bytes of %s\n", sent.size, (char*)self->super->send_buff->buffer);
     	
-    	dataBuffer recv=sock_util__receive__socket( self->super );
+    	dataBuffer recv=self->vtable->receive( self->super );
     	printf("Incoming (%i bytes)from server: %s\n", recv.size, (char*)self->super->recv_buff->buffer);
 	}
 }

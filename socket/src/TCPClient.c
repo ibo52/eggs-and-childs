@@ -18,6 +18,7 @@ TCPClient* tcp_client__new(int addr, int port){
 	
 	self->super=super;
 	
+	self->vtable=&TCPClient_VTable__default;
 	return self;
 }
 
