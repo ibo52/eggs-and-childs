@@ -8,7 +8,7 @@ typedef struct __UDPServer_VTable UDPServer_VTable;
 
 typedef struct __UDPServer{
 	Socket* super;
-	UDPServer_VTable* vtable;	//virtual functions table
+	const UDPServer_VTable* vtable;	//virtual functions table
 }UDPServer;
 
 struct __UDPServer_VTable{
@@ -18,9 +18,9 @@ struct __UDPServer_VTable{
 };
 
 //static table for default virtual functions
-static UDPServer_VTable UDPServer_VTable__default={
-	.receive=sock_util__receive__socket,
-	.send=sock_util__send__socket
+static const UDPServer_VTable UDPServer_VTable__default={
+	.receive=socket__receive,
+	.send=socket__send
 };
 
 UDPServer* udp_server__new(int address, int port);

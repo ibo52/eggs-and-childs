@@ -20,8 +20,8 @@ struct __TCPServer_VTable{
 
 //Default Virtual functions table
 static const TCPServer_VTable TCPServer_VTable__default={
-	.receive=sock_util__receive__socket,
-	.send=sock_util__send__socket
+	.receive=socket__receive,
+	.send=socket__send
 };
 /*
 *	Create new object (Allocate data on memory)
