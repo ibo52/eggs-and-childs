@@ -23,6 +23,7 @@ UDPClient* udp_client__new(int address, int port){
 	
 	self->super=super;
 	
+	self->vtable=&UDPClient_VTable__default;
 	return self;
 }
 
