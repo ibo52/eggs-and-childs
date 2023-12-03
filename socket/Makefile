@@ -40,7 +40,7 @@ compile_test:
 	@ for var in $(TEST_FILES); do \
 	echo "$(INFO_COLOR)'$$var' compiling..$(RESET_COLOR)"; \
 	echo "\t$(CC) $(CFLAGS) $(SOURCE_FILES) $$var -I$(HEADER_FILES) -o "$(PROGRAM_ROOT_DIR)/$$var.out" $(CLIBS) ";\
-	$(CC) $(CFLAGS) $(SOURCE_FILES) $$var -I$(HEADER_FILES) -o "$(PROGRAM_ROOT_DIR)/$$var.out" $(CLIBS) ; \
+	$(CC) $(CFLAGS) $(SOURCE_FILES) $$var -I$(HEADER_FILES) -o "$(PROGRAM_ROOT_DIR)/$$var.out" $(CLIBS) || break; \
 	echo; \
 	done
 	

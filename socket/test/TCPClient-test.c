@@ -14,15 +14,15 @@ static void start(TCPClient* self){
     int i;
 	for(i=0; i<1; i++){
 
-		sock_util__buffer_write(self->super->send_buff,"hello from TCP client");
+		self->super->send_buff->vtable->write(self->super->send_buff,"hello from TCP client");//points to static sock_util__buffer_write
 
 		dataBuffer sent=self->vtable->send( self->super );
     	//int sent=sock_util__send(self->super->fd, self->super->send_buff, self->super->recv_buff->size );
     	
-    	printf("Sent:%i bytes of %s\n", sent.size, (char*)self->super->send_buff->buffer);
+    	printf("Sent:%i bytes of %s\n", sent.size, self->super->send_buff->vtable->get(self->super->send_buff));
     	
     	dataBuffer recv=self->vtable->receive( self->super );
-    	printf("Incoming (%i bytes)from server: %s\n", recv.size, (char*)self->super->recv_buff->buffer);
+    	printf("Incoming (%i bytes)from server: %s\n", recv.size, self->super->recv_buff->vtable->get(self->super->recv_buff) );
 	}
 }
 

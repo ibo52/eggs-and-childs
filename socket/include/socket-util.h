@@ -18,16 +18,23 @@
 /*
 *
 */
-typedef struct __Socket Socket;//forward declaration to Server.h
-
+typedef struct __Socket Socket;//forward declaration to Socket.h
+typedef struct __dataBuffer_VTable dataBuffer_VTable;
 
 /*message buffer to use on socket communication*/
 typedef struct __dataBuffer{
 	void* buffer;		//buffer to hold ADDRESS of data
 	uint32_t size;		//written data size of buffer
 	uint32_t max_size;	//maximum size of buffer
+	
+	const dataBuffer_VTable* vtable;//virtual functions table;
 }dataBuffer;//message buffer to use on socket communication
 
+struct __dataBuffer_VTable{
+	void (*append)(dataBuffer* self, const char* string);
+	void (*write)(dataBuffer* self, const char* string);
+	const char* (*get)(dataBuffer* self);
+};
 
 /*
 	@param size: size of the buffer
@@ -71,7 +78,7 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer);
 *	@param self	: destination Socket to forward message
 *	@return		: Bytes sent in total
 */
-dataBuffer sock_util__send__socket(Socket* self);
+//dataBuffer sock_util__send__socket(Socket* self);
 
 
 /*
@@ -80,7 +87,7 @@ dataBuffer sock_util__send__socket(Socket* self);
 *	@param self: Socket to listen for a message receivation from others
 *	@return	   : Bytes received in total
 */
-dataBuffer sock_util__receive__socket(Socket* self);
+//dataBuffer sock_util__receive__socket(Socket* self);
 
 
 /*
@@ -109,4 +116,22 @@ void sock_util__buffer_append(dataBuffer* buff, const char* string);
 */
 const char* sock_util__buffer_get(dataBuffer* buff);
 
+const static dataBuffer_VTable dataBuffer_VTable__default={
+	.append=sock_util__buffer_append,
+	.write=sock_util__buffer_write,
+	.get=sock_util__buffer_get
+};
+/*
+typedef struct __Socket_VTable Socket_VTable;//forward declaration to Socket
+//to easily access functions from definitions
+struct SocketUtil_VTable{
+	const dataBuffer_VTable* dataBuffer;
+	const Socket_VTable* Socket;			
+};
+
+const static struct SocketUtil_VTable SocketUtil_VTable__default={
+	.dataBuffer=&dataBuffer_VTable__default,
+	.Socket=&Socket_VTable__default
+};
+*/
 #endif

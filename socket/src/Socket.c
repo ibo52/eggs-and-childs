@@ -107,7 +107,7 @@ dataBuffer socket__send(Socket* self){
 	@param self	: sender Socket to forward message to other
 	@return		: Bytes sent in total
 	*/
-	int MAX_BYTES_PER_SEND=65536-28;//28 allocated for is udp protocol headers
+	int MAX_BYTES_PER_SEND=65536-28;//28 bytes are allocated for udp protocol headers
 	int sent_size=0;
 	int length=self->send_buff->size;
 
