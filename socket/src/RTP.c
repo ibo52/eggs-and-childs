@@ -8,24 +8,30 @@
 #include<unistd.h>
 #include<stdint.h>
 #include<stdlib.h>
+#include<string.h>
 #include<time.h>	//to randomize RTP sequence number
+#include<errno.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
 
+#include "socket-util.h" //dataBuffer
 #include "RTP.h"
 
-RTP* RTP__new(void){
+RTP* rtp__new(void){
 	srand(time(NULL));	//seed the random function by current time
 	
 	RTP* self=calloc(1, sizeof(RTP));
 	
 	//first 2 bit for the RTP version(curernt version 2)
-	self->VPXCC=0x2<<6;
-	
+	//padding:0, extension:0, csrc count:0
+	//thus 1000 0000 as binary representation(0x80H)
+	self->VPXCC=0x80;
 	//skip P, which indicates presence of a padding
 	//skip X, which indicates presence of an extension
 	
 	//payload 26: JPEG image format to send
 	//reference: https://en.wikipedia.org/wiki/RTP_payload_formats
-	self->MPT=26;
+	self->MPT=RTP_PAYLOAD_TYPE_JPEG;
 	
 	self->sequence_number=rand()%65536;//init 16 bit random seqeunce number
 	
@@ -35,37 +41,37 @@ RTP* RTP__new(void){
 	return self;
 }
 
-void RTP__destroy(RTP** self){	
+void rtp__destroy(RTP** self){	
 	
 	free( (*self) );
-	
+
 	(*self)=NULL;
 	
-	printf("UDPClient object destructed\n");
+	printf("RTP object destructed\n");
 }
 
-void RTP__toString(RTP* self){
+void rtp__toString(RTP* self){
 
 	printf("RTP Header\n"
 		   "\t- 0th byte ----------------\n"
-		   "\tVersion:            %24i\n"
-		   "\tPadding:            %24s\n"
-		   "\tExtension:          %24s\n"
-		   "\tContributors count: %24i\n"
-		   "\tMarker:             %24s\n"
-		   "\tPayload Type:       %24s\n"
-		   "\tSequence number:    %24i\n"
+		   "\tVersion:            %25i\n"
+		   "\tPadding:            %25s\n"
+		   "\tExtension:          %25s\n"
+		   "\tContributors count: %25i\n"
+		   "\tMarker:             %25s\n"
+		   "\tPayload Type:       %25s\n"
+		   "\tSequence number:    %25i\n"
 		   "\t- 4th byte ----------------\n"
-		   "\ttimestamp:               %x\n"
-		   "\tSync. source id(you):    %i\n"
-		   "\tContributing source IDs: %i\n"
+		   "\ttimestamp:               %20x\n"
+		   "\tSync. source id(you):    %20i\n"
+		   "\tContributing source IDs: %20i\n"
 		   ,self->VPXCC>>6&0x2,					//version
 		   (self->VPXCC>>5&0x1? "yes":"no"),	//pad
 		   (self->VPXCC>>3&0x1? "yes":"no"),	//eXtension
 		   self->VPXCC&0x0f,					//CC
 		   
 		   (self->MPT>>7&0x1? "yes":"no"),		//marker
-		   ((self->MPT&0x7f)==26? "JPEG":"unknwn/othr"),		//payload type
+		   ((self->MPT&0x7f)==RTP_PAYLOAD_TYPE_JPEG? "JPEG":"unknwn/othr"),		//payload type
 		   self->sequence_number,
 		   
 		   self->timestamp,
@@ -73,3 +79,56 @@ void RTP__toString(RTP* self){
 		   self->csrc
 		   );
 }
+
+/*
+	@param self	: RTP header to write before message
+	@param sock	: sender Socket to forward message to other(which also holds data to send)
+	@return		: Bytes sent in total
+*/
+dataBuffer rtp__send(RTP* self, Socket* sock){
+
+	int sent_size=0;
+	int total_data_len=sock->send_buff->size;
+
+	dataBuffer* RTPBuffer=sock_util__alloc_buffer(RTP_BYTES_PER_CHUNK);
+	static int RTP_size=sizeof(RTP);
+
+	while(sent_size < total_data_len){
+		
+		//1. write rtp chunk
+		memcpy(RTPBuffer->buffer, self, RTP_size);//write rtp header
+		
+		//write chunk of data to remaining space of buffer
+		memcpy(RTPBuffer->buffer + RTP_size, sock->send_buff->buffer + sent_size, RTP_BYTES_PER_CHUNK-RTP_size);
+		RTPBuffer->size=RTP_BYTES_PER_CHUNK;
+
+		//temporary holder for sockets buff
+		dataBuffer* temp=sock->send_buff;
+		sock->send_buff=RTPBuffer;
+		
+		sent_size+=socket__send(sock).size-RTP_size;
+		printf("sent chunk of seq number %i :",self->sequence_number);
+		printf("%s\n",(char*)sock->send_buff->buffer+RTP_size);
+		sock->send_buff=temp;
+		self->sequence_number++;
+	}
+	
+	sock_util__dealloc_buffer(&RTPBuffer);
+
+	dataBuffer retData={NULL, sent_size, 0};
+	return retData;
+}
+
+/*	Receive rtp messages from a client
+ * @param sock : ocket to receive data from
+ * @return : info about received data
+*/
+dataBuffer rtp__receive(Socket* sock){
+
+
+	return socket__receive(sock);
+}
+/*
+dataBuffer rtp__receive(dataBuffer buff){
+	return NULL;
+}*/

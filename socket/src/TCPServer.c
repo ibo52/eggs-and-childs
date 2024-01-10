@@ -14,7 +14,7 @@
 #include<pthread.h>
 
 #include "TCPServer.h"
-#include "Socket.h"
+
 //---thread functions--------------------
 static void* client_handler(void* argument);
 static void* tcp_server__starter_task(void* argument);

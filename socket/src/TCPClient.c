@@ -8,7 +8,6 @@
 #include<string.h>
 
 #include "TCPClient.h"
-#include "Socket.h"
 
 TCPClient* tcp_client__new(int addr, int port){
 

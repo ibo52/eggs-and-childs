@@ -6,11 +6,11 @@
 int main(int argc, char** argv){
 	printf("Test for RTP class\n\n");
 	
-	RTP* self=RTP__new();
+	RTP* self=rtp__new();
 	
-	RTP__toString(self);
+	rtp__toString(self);
 	
-	RTP__destroy(&self);
+	rtp__destroy(&self);
 	
 	printf("\nTest for RTP class done\n");
 	return 0;

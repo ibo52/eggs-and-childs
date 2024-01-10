@@ -31,11 +31,10 @@ dataBuffer* sock_util__alloc_buffer(uint32_t size){//to allocate dataBuffer stru
 
 /*
 *	Free the buffer of bytes which used through socket communication
+*
+*	@param dataBuffer: pointer to buffer to be free'd
 */
 void sock_util__dealloc_buffer(dataBuffer** buffer){
-	/*
-	@param dataBuffer: pointer to buffer to be free'd
-	*/
 
 	free( (*buffer)->buffer );
 	free( (*buffer) );
@@ -44,13 +43,11 @@ void sock_util__dealloc_buffer(dataBuffer** buffer){
 /*
 *	Interface for connection oriented (TCP) socket structs
 *	Read from socket file descriptor, and store data read
+*	@param client_fd	: file descriptor of client to receive data from
+*	@param buffer_offset: buffer of byte to store received bytes
+*	@return				: Bytes received in total
 */
 int sock_util__receive(intptr_t client_fd, dataBuffer* buffer_offset){
-	/*
-	@param client_fd	: file descriptor of client to receive data from
-	@param buffer_offset: buffer of byte to store received bytes
-	@return				: Bytes received in total
-	*/
 	
 		int recv_retval;//total received size of message from procedure call 
 		if( (recv_retval= recv(client_fd, buffer_offset->buffer , buffer_offset->max_size, 0)) <0 ){
@@ -67,13 +64,13 @@ int sock_util__receive(intptr_t client_fd, dataBuffer* buffer_offset){
 /*
 *	Interface for connection oriented (TCP) socket structs
 *	write to socket file descriptor, and send data
+*
+*	@param client_fd	: file descriptor of client to receive data from
+*	@param buffer_offset: buffer of byte to read bytes to send
+*	@return				: Bytes sent in total
 */
 int sock_util__send(intptr_t client_fd, dataBuffer* buffer_offset){
-	/*
-	@param client_fd	: file descriptor of client to receive data from
-	@param buffer_offset: buffer of byte to read bytes to send
-	@return				: Bytes sent in total
-	*/
+
 	int sent_size=0;
 	
 	while( sent_size < buffer_offset->size ){
@@ -89,40 +86,49 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer_offset){
 	return sent_size;
 }
 
+/*
+*	Write string 	data to dataBuffer
+*
+*	@param buff		: 	dataBuffer object to write string data
+*	@param string	: 	data to be written to buffer
+*	@return	   		: 
+*/
 void sock_util__buffer_write(dataBuffer* buff, const char* string){
-	/*
-	*	Write string 	data to dataBuffer
-	*
-	*	@param buff		: 	dataBuffer object to write string data
-	*	@param string	: 	data to be written to buffer
-	*	@return	   		: 
-	*/
+	
 	strncpy((char* )buff->buffer, string, buff->max_size);
 	buff->size = strlen((char* )buff->buffer);
 }
 
-
-void sock_util__buffer_append(dataBuffer* buff, const char* string){
-	/*
+/*
 	*	append string to end of data on dataBuffer
 	*
 	*	@param buff		: 	dataBuffer object to append string data
 	*	@param string	: 	data to be appended to buffer
 	*	@return	   		:
 	*/
+void sock_util__buffer_append(dataBuffer* buff, const char* string){
+
 	uint32_t n=buff->max_size - buff->size;
 	strncat((char* )buff->buffer, string , n);
 	
 	buff->size = strlen((char* )buff->buffer);
 }
 
-
+/*
+*	return data on buffer as string
+*
+*	@param buff: 	dataBuffer object to get string data
+*	@return	   : 	buffer as string
+*/
 const char* sock_util__buffer_get(dataBuffer* buff){
-	/*
-	*	return data on buffer as string
-	*
-	*	@param buff: 	dataBuffer object to get string data
-	*	@return	   : 	buffer as string
-	*/
+
 	return (char*)buff->buffer;
+}
+
+
+int min(int a, int b){
+	if(a<b)
+		return a;
+		
+	return b;
 }

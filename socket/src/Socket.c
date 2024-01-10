@@ -5,12 +5,12 @@
 #include <sys/types.h> 
 #include <unistd.h> // read(), write(), close(), sleep
 #include<errno.h>
-#include<netinet/in.h>
 #include<string.h>
 #include<pthread.h>
 
 #include<stdint.h>
 #include "Socket.h"
+#include "socket-util.h"
 
 Socket* socket__new(int addr, int port, int type){
 	Socket* self=calloc(1, sizeof(Socket));
@@ -95,13 +95,6 @@ void socket__destroy(Socket** self){
 	printf("Socket object destructed\n");
 }
 
-static int min(int a, int b){
-	if(a<b)
-		return a;
-		
-	return b;
-}
-
 dataBuffer socket__send(Socket* self){
 	/*
 	@param self	: sender Socket to forward message to other
@@ -132,10 +125,6 @@ dataBuffer socket__send(Socket* self){
 }
 
 dataBuffer socket__receive(Socket* self){
-	/*
-	@param self: Socket to listen for a message receivation from others
-	@return	   : Bytes received in total
-	*/
 	
 		int recv_retval;			//total received size of message from procedure call 
 		struct sockaddr_in *client=malloc(1*sizeof(struct sockaddr_in));	//recvfrom will fill this struct
@@ -143,7 +132,6 @@ dataBuffer socket__receive(Socket* self){
 			
 		if( (recv_retval= recvfrom(self->fd, self->recv_buff->buffer , self->recv_buff->max_size, 0, (struct sockaddr *)client, &client_address_size)) <0 ){
 			perror("Error while receiving from socket");
-			exit(recv_retval);
 		
 		}
 		

@@ -1,15 +1,16 @@
-#ifndef HALO_SOCKET_COMMUNICATOR
-#define HALO_SOCKET_COMMUNICATOR
+#ifndef HALO_SOCKET_H
+#define HALO_SOCKET_H
 
 #include<stdint.h>
-#include "socket-util.h"
+#include<netinet/in.h>	//sockaddr_in
+
 typedef struct __dataBuffer dataBuffer;//forward declaration to socket-util.h
 typedef struct __Socket_VTable Socket_VTable;
+
 /*
 *	CommunicationObject
 *	struct holds socket info and buffers for communication
 */
-
 typedef struct __Socket{
 	int fd;						//file descriptor
 	struct sockaddr_in socket;	//sockaddr struct
@@ -20,6 +21,9 @@ typedef struct __Socket{
 	const Socket_VTable* vtable; //virtual functions table
 }Socket;
 
+/*
+*	Virtual methods table for Class
+*/
 struct __Socket_VTable{
 	dataBuffer (*receive)(Socket* self);
 	dataBuffer (*send)(Socket* self);

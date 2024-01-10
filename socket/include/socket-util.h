@@ -21,7 +21,9 @@
 typedef struct __Socket Socket;//forward declaration to Socket.h
 typedef struct __dataBuffer_VTable dataBuffer_VTable;
 
-/*message buffer to use on socket communication*/
+/*
+*	Message buffer to use on socket communication etc.
+*/
 typedef struct __dataBuffer{
 	void* buffer;		//buffer to hold ADDRESS of data
 	uint32_t size;		//written data size of buffer
@@ -30,6 +32,9 @@ typedef struct __dataBuffer{
 	const dataBuffer_VTable* vtable;//virtual functions table;
 }dataBuffer;//message buffer to use on socket communication
 
+/*
+*	Virtual methods table for dataBuffer Class
+*/
 struct __dataBuffer_VTable{
 	void (*append)(dataBuffer* self, const char* string);
 	void (*write)(dataBuffer* self, const char* string);
@@ -72,7 +77,7 @@ int sock_util__receive(intptr_t client_fd, dataBuffer* buffer);
 int sock_util__send(intptr_t client_fd, dataBuffer* buffer);
 
 
-/*
+/*DEPRECATED: Moved to Socket Class
 *	Send message through Socket object. Common interface for TCP and UDP sockets
 *	
 *	@param self	: destination Socket to forward message
@@ -81,7 +86,7 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer);
 //dataBuffer sock_util__send__socket(Socket* self);
 
 
-/*
+/*DEPRECATED: Moved to Socket Class
 *	Receive message through Socket object. Common interface for TCP and UDP sockets
 *	
 *	@param self: Socket to listen for a message receivation from others
@@ -108,6 +113,7 @@ void sock_util__buffer_write(dataBuffer* buff, const char* string);
 *	@return	   		:
 */	
 void sock_util__buffer_append(dataBuffer* buff, const char* string);
+
 /*
 *	return data on buffer as string
 *
@@ -134,4 +140,6 @@ const static struct SocketUtil_VTable SocketUtil_VTable__default={
 	.Socket=&Socket_VTable__default
 };
 */
+int min(int a, int b);
+
 #endif

@@ -10,11 +10,6 @@ PROGRAM_ROOT_DIR=bin
 PROGRAM_TEST_DIR=bin/test
 
 HEADER_FILES:=include/
-SERVER_FILE1:=TCPServer.c Server.c socket-util.c
-SERVER_FILE2:=UDPServer.c Server.c socket-util.c
-
-CLIENT_FILE1:=TCPClient.c socket-util.c
-CLIENT_FILE2:=UDPClient.c socket-util.c
 
 SOURCE_FILES=$(shell find src/ -type f -name "*.c")
 TEST_FILES=$(shell find test/ -type f -name "*.c")

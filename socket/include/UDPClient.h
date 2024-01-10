@@ -2,6 +2,8 @@
 #define HALO_SOCKET_UDPCLIENT
 
 #include<stdint.h>
+#include "Socket.h"
+#include "socket-util.h"
 
 typedef struct __UDPClient_VTable UDPClient_VTable;
 /*message buffer to use on socket communication*/

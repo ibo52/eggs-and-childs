@@ -2,7 +2,7 @@
 #define HALO_SOCKET_SERVER_TCP
 
 #include<stdint.h>
-#include "socket-util.h"
+#include "socket-util.h"//which includes Socket.h its inside
 
 typedef struct __TCPServer_VTable TCPServer_VTable;
 

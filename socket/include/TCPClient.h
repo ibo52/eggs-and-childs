@@ -2,7 +2,7 @@
 #define HALO_SOCKET_TCPCLIENT
 
 #include<stdint.h>
-#include "socket-util.h"
+#include "socket-util.h"//which includes Socket.h its inside
 
 typedef struct __TCPClient_VTable TCPClient_VTable;
 typedef struct __TCPClient{
