@@ -23,6 +23,7 @@ static void start(TCPClient* self){
     	
     	dataBuffer recv=self->vtable->receive( self->super );
     	printf("Incoming (%i bytes)from server: %s\n", recv.size, self->super->recv_buff->vtable->get(self->super->recv_buff) );
+		free(recv.buffer);
 	}
 }
 
