@@ -25,11 +25,12 @@
 - Maintains connectionless communication
 
 ***
-##To Do
+## To Do
 1. Base socket communication [ :heavy_check_mark: ]
 2. TCP socket communication [ :heavy_check_mark: ]
 3. UDP socket communication [ :heavy_check_mark: ]
 4. RTP/UDP socket communication [ :wavy_dash: ]
+   1. Packet re-ordering on client side [ :wavy_dash: ]
 5. RTP/UDP video streaming [ :heavy_minus_sign: ]
 ***
 system | specs | of development|
