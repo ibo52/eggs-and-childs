@@ -2,7 +2,7 @@
 #include "LinkedList.h"
 #include <stdio.h>
 
-LinkedList* new__LinkedList(void){
+LinkedList* new__linked_list(void){
     LinkedList * self=calloc(1, sizeof(LinkedList));
     //all values are null at first
 
@@ -10,7 +10,7 @@ LinkedList* new__LinkedList(void){
     return self;
 }
 
-void LinkedList__destroy(LinkedList** self){
+void linked_list__destroy(LinkedList** self){
 
     Node *temp=(*self)->head;
     for (int i=0; i < (*self)->size; i++){
@@ -31,7 +31,7 @@ void LinkedList__destroy(LinkedList** self){
     
 }
 
-void LinkedList__append(LinkedList* self, Node* n){
+void linked_list__append(LinkedList* self, Node* n){
 
     /*if there is tail elmnt (head and tail are points same loc if linked list newly initialized )
         bind node 'n' to next of tail;
@@ -58,12 +58,47 @@ void LinkedList__append(LinkedList* self, Node* n){
 
 }
 
-Node LinkedList__pop(LinkedList* self, int index){
+void linked_list__append_index(LinkedList* self, Node* n, int index){
+
+    Node* temp=self->head;
+
+    for (int32_t i = 0; i < index; i++){
+
+        if ( temp && temp->next ){
+            
+            temp=temp->next;
+        }else{
+            
+            linked_list__append(self, n);//if index> len(list); just add to the last
+            return;
+        }
+    }
+
+    /*if the node being popped is between any two nodes
+        concat that nodes to each other before popping
+    */
+   printf("ll append index: temp is %s\n", temp? "not NULL":"NULL");
+   
+    if(temp->previous){
+
+        temp->previous->next=n;
+        n->previous=temp->previous;
+
+    }else{//temp do not have previous(it is head)
+        self->head=n;
+    }
+    n->next=temp;
+    temp->previous=n;
+
+    self->size++;
+}
+
+Node linked_list__pop(LinkedList* self, int index){
 
     Node* temp=self->head;
     Node n={0,0,0};
 
-    for (int32_t i = 1; i < index; i++){
+    for (int32_t i = 1;self && i < index; i++){
 
         if (temp!=NULL){
             temp=temp->next;
@@ -89,7 +124,7 @@ Node LinkedList__pop(LinkedList* self, int index){
     return n;
 }
 
-Node LinkedList__popLast(LinkedList* self){
+Node linked_list__pop_last(LinkedList* self){
     Node n={0,0,0};
 
     if (self){//if not null
@@ -119,7 +154,7 @@ Node LinkedList__popLast(LinkedList* self){
     return n;
 }
 
-Node LinkedList__popFirst(LinkedList* self){
+Node linked_list__pop_first(LinkedList* self){
     Node n={0,0,0};
     
     if(self){//if not null
@@ -147,7 +182,7 @@ Node LinkedList__popFirst(LinkedList* self){
     return n;
 }
 
-Node LinkedList__getHead(LinkedList* self){
+Node linked_list__get_head(LinkedList* self){
     Node n={0,0,0};
     
     if(self){//if not null
@@ -168,7 +203,7 @@ Node LinkedList__getHead(LinkedList* self){
     return n;
 }
 
-Node LinkedList__getTail(LinkedList* self){
+Node linked_list__get_tail(LinkedList* self){
     Node n={0,0,0};
     
     if(self){//if not null
@@ -188,23 +223,35 @@ Node LinkedList__getTail(LinkedList* self){
     }
     return n;
 }
+#include "RTP.h"
+void linked_list__print(LinkedList* self){
 
-void LinkedList__print(LinkedList* self){
-
-    if(!self)
+    if(LinkedListClass.isEmpty(self))
         return;
 
     Node* temp=self->head;
     
     int c=0;
-    for ( ; NodeClass.hasNext(temp); temp=NodeClass.getNext(temp)){
-        printf("%s~",(char* )temp->data_ptr);
+
+    while ( temp ){
+        printf("%i~",((RTP* )temp->data_ptr)->sequence_number);
 
         if (++c %10 ==0){
             printf("\n");
         }
+
+        temp=NodeClass.getNext(temp);
         
-    }printf("\n");
+    }
     
+    printf("\n");
+    
+}
+
+int8_t linked_list__is_empty(LinkedList* self){
+    if ( !self->head )//if no head element
+        return 1;
+    
+    return 0;
 }
 

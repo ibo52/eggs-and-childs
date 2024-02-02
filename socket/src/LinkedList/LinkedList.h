@@ -23,6 +23,7 @@ struct __LinkedList{
  * through object
 */
 struct __LinkedList_VTable{
+    LinkedList* (*new)(void);
     void (*destroy)(LinkedList** self);
 
     void (*append)(LinkedList* self, Node* n);
@@ -37,24 +38,39 @@ struct __LinkedList_VTable{
     Node (*getTail)(LinkedList* self);
 
     void (*print)(LinkedList* self);
+
+    int8_t (*isEmpty)(LinkedList* self);
 };
 
 /**
  * Store new reference of linked list structure on mem
 */
-LinkedList* new__LinkedList(void);
+LinkedList* new__linked_list(void);
 
 /**
  * Clears all Nodes inside linked list,
  * then clears itself.
 */
-void LinkedList__destroy(LinkedList** self);
+void linked_list__destroy(LinkedList** self);
 
 /**
  * Append desired element to end of the list
 */
-void LinkedList__append(LinkedList* self, Node* n);
+void linked_list__append(LinkedList* self, Node* n);
 
+/**
+ * Add desired element to the given index.
+
+ * concat current element at index to next of Node
+ * 'n' if there is an element at that index.
+
+ * append the Node 'n' to the tail if there is
+ * no such an index(as well as element)
+ * 
+ * @param n: Node to be appended to the given index
+ * @param index: index to be appended
+*/
+void linked_list__append_index(LinkedList* self, Node* n, int index);
 /**
  * remove and return last element from the list
  * NOTE: the data_ptr member of the popped Node have to
@@ -62,7 +78,7 @@ void LinkedList__append(LinkedList* self, Node* n);
  * --> free( node.data_ptr );
  * 
 */
-Node LinkedList__popLast(LinkedList* self);
+Node linked_list__pop_last(LinkedList* self);
 
 /**
  * remove and return first element from the list
@@ -71,7 +87,7 @@ Node LinkedList__popLast(LinkedList* self);
  * --> free( node.data_ptr );
  * 
 */
-Node LinkedList__popFirst(LinkedList* self);
+Node linked_list__pop_first(LinkedList* self);
 
 /**
  * if there is one, pop the Node at given index
@@ -79,45 +95,39 @@ Node LinkedList__popFirst(LinkedList* self);
  * be free'd manually after done the operations on data_ptr
  * --> free( node.data_ptr );
 */
-Node LinkedList__pop(LinkedList* self, int index);
+Node linked_list__pop(LinkedList* self, int index);
 
-Node LinkedList__getHead(LinkedList* self);
+Node linked_list__get_head(LinkedList* self);
 
-Node LinkedList__getTail(LinkedList* self);
+Node linked_list__get_tail(LinkedList* self);
 
 /**
  * Print eleements
 */
-void LinkedList__print(LinkedList* self);
+void linked_list__print(LinkedList* self);
+
+int8_t linked_list__is_empty(LinkedList* self);
 
 /**
  * Default static virtual method table for all Linked Lists
- * 
- * Not: varsayılan statik fonksiyon isimlendirmesi Class içerecek
- * biçimde yapılsaydı daha mantıklı olrdu
- * 
- * örnegin linkedlist fonksiyonlarına erişmek için
- * LinkedList_VTable__default yerine
- * LinkedListClass yazalım
- * 
- * Bu isimlendirme daha açık olduğu için
- * Obje içinde vtable tutmaya gerek kalmaz(bence)
- * 
 */
 const static LinkedList_VTable LinkedListClass={
-    .destroy=LinkedList__destroy,
+    .new=new__linked_list,
+    .destroy=linked_list__destroy,
 
-    .append=LinkedList__append,
-    .push=LinkedList__append,
-    //.remove=LinkedList__popLast,
-    .pop=LinkedList__popLast,
-    .popFirst=LinkedList__popFirst,
-    .popLast=LinkedList__popLast,
+    .append=linked_list__append,
+    .push=linked_list__append,
+    //.remove=linked_list__pop_last,
+    .pop=linked_list__pop_last,
+    .popFirst=linked_list__pop_first,
+    .popLast=linked_list__pop_last,
     
-    .getHead=LinkedList__getHead,
-    .getTail=LinkedList__getTail,
+    .getHead=linked_list__get_head,
+    .getTail=linked_list__get_tail,
 
-    .print=LinkedList__print
+    .print=linked_list__print,
+
+    .isEmpty=linked_list__is_empty
     };
 
 #endif
