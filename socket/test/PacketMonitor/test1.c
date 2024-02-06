@@ -3,7 +3,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-
 int main(int argc, char** argv){
 
     PacketMonitor* p=packet_monitor__new();
@@ -16,7 +15,13 @@ int main(int argc, char** argv){
         RTP* rtp=rtp__new();
         rtp->sequence_number=seq[i];
         
+        printf("before arrange: ");
+        LinkedListClass.print(p->store);
+
         rearrange_incoming_rtp_packet(p->store, rtp );
+
+        printf("after arrange: ");
+        LinkedListClass.print(p->store);
         printf("---------------------------------------\n");
     }
     
