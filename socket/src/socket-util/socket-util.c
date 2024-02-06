@@ -100,6 +100,40 @@ void sock_util__buffer_write(dataBuffer* buff, const char* string){
 }
 
 /*
+*	Write a dataBuffer contents to another
+*
+*	@param buff		: 	dataBuffer object to write string data
+*	@param buff2	:	dataBuffer to copy from
+*	@param size		: 	size to be written to buffer
+*	@return	   		: 
+*/
+void sock_util__buffer_write_size(dataBuffer* buff, dataBuffer* buff2){
+
+	buff->size =(buff->max_size >= buff2->size)? buff2->size : buff->max_size;
+	
+	for (int64_t i = 0; i < buff->size; i++){
+		*(int8_t*)(buff->buffer+i)=*(int8_t*)(buff2->buffer+i);
+	}
+}
+
+/*
+*	Write a buffer contents to dataBuffer
+*
+*	@param buff		: 	dataBuffer object to write string data
+*	@param buff2	:	dataBuffer to copy from
+*	@param size		: 	size to be written to buffer
+*	@return	   		: 
+*/
+void sock_util__buffer_write_sizei(dataBuffer* buff, void* buff2, int buff2_size){
+
+	buff->size =(buff->max_size >= buff2_size)? buff2_size : buff->max_size;
+	
+	for (int64_t i = 0; i < buff->size; i++){
+		*(int8_t*)(buff->buffer+i)=*(int8_t*)(buff2+i);
+	}
+}
+
+/*
 	*	append string to end of data on dataBuffer
 	*
 	*	@param buff		: 	dataBuffer object to append string data

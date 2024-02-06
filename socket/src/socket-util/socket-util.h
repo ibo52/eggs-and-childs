@@ -104,6 +104,16 @@ int sock_util__send(intptr_t client_fd, dataBuffer* buffer);
 */
 void sock_util__buffer_write(dataBuffer* buff, const char* string);
 
+/*
+*	copy data from a dataBuffer to another
+*
+*	@param buff: 	dataBuffer object to write data
+*	@param buff2: 	dataBuffer object to copy from
+*	@return	   :
+*/
+void sock_util__buffer_write_size(dataBuffer* buff, dataBuffer* buff2);
+
+void sock_util__buffer_write_sizei(dataBuffer* buff, void* buff2, int buff2_size);
 
 /*
 *	append string to end of data on dataBuffer
