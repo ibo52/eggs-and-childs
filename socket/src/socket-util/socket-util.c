@@ -22,7 +22,7 @@ dataBuffer* sock_util__alloc_buffer(uint32_t size){//to allocate dataBuffer stru
 	dataBuffer* b= (dataBuffer*)calloc(1, sizeof(dataBuffer));
 	
 	b->buffer = calloc(size+1, sizeof(int8_t));
-	b->size=0;
+
 	b->max_size=size;
 	
 	b->vtable=&dataBuffer_VTable__default;

@@ -38,5 +38,27 @@ void rtp_server__destroy(RTPServer** self){
 	printf("RTPServer object destructed\n");
 }
 
+dataBuffer rtp_server__recv(RTPServer* self){
+	return socket__receive(self->super->super);
+}
+
+dataBuffer rtp_server__sendRTP(RTPServer* self, Socket* toSocket){
+	return rtp__send(self->rtp_header, toSocket);
+}
+
+dataBuffer rtp_server__send(Socket* toSocket){
+	return socket__send(toSocket);
+}
+
 void rtp_server__start(RTPServer* self){
 }
+/*
+dataBuffer rtp_server__recv(RTPServer* self){
+
+	dataBuffer recvd= socket__receive(self->super->super);
+
+	//parse info of client to communicate with socket
+	Socket client={ self->super->super->fd, *(struct sockaddr_in *)recvd.buffer, self->super->super->recv_buff, self->super->super->send_buff };
+
+
+}*/

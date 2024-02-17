@@ -125,15 +125,18 @@ dataBuffer socket__send(Socket* self){
 }
 
 dataBuffer socket__receive(Socket* self){
-	
-		int recv_retval;			//total received size of message from procedure call 
-		struct sockaddr_in *client=malloc(1*sizeof(struct sockaddr_in));	//recvfrom will fill this struct
-		socklen_t client_address_size = sizeof(*client);
+
+	int recv_retval;			//total received size of message from procedure call 
+	struct sockaddr_in *client=malloc(1*sizeof(struct sockaddr_in));	//recvfrom will fill this struct
+	socklen_t client_address_size = sizeof(*client);
 			
-		if( (recv_retval= recvfrom(self->fd, self->recv_buff->buffer , self->recv_buff->max_size, 0, (struct sockaddr *)client, &client_address_size)) <0 ){
-			perror("Error while receiving from socket");
-		
+	if( (recv_retval= recvfrom(self->fd, self->recv_buff->buffer , self->recv_buff->max_size, 0, (struct sockaddr *)client, &client_address_size)) <0 ){
+		perror("Error while receiving from socket");
+		if (errno==ECONNREFUSED){
+			exit(errno);
 		}
+		
+	}
 		
 	self->recv_buff->size=recv_retval;
 	

@@ -18,37 +18,25 @@
 #include "LinkedList.h"
 #include "PacketMonitor.h"
 
-static void listener(Socket* self, LinkedList* ll){
-   while (1){
-      socket__receive(self);
-
-      RTP* rtpPacket=(RTP*)self->recv_buff->buffer;
-      
-      PacketMonitorClass.rearrangeIncomingRTP(ll, rtpPacket);
-
-      printf("rtp seq num %ui\n", rtpPacket->sequence_number);
-
-      printf("jpeg sof expected:%x%x %x%x\n",*(int8_t* )(self->recv_buff->buffer+17),
-      *(int8_t* )(self->recv_buff->buffer+18),
-      *(int8_t* )(self->recv_buff->buffer+19),
-      *(int8_t* )(self->recv_buff->buffer+20));
-      
-
-   }
-}
+#include <sys/time.h>
 
 static void start(RTPClient* self){
 	
 	sock_util__buffer_write(self->super->super->send_buff, "Hello from RTP video stream client.");
 
    /* Send the message in buf to the server */
-   dataBuffer sent=self->vtable->send(self->super->super);
+   dataBuffer sent=RTPClientClass.send(self);
 	printf("Sent (%i bytes) message: %s\n", sent.size, (char*)self->super->super->send_buff->buffer);
    
    //wait for a image stream from server
-   //dataBuffer recvd=self->vtable->receive(self->super->super);
+   //listen until sock close req arrived
    LinkedList* l=LinkedListClass.new();
-   listener(self->super->super, l);
+   
+   RTPClientClass.listener(self, l);
+   
+   printf("linkedlist size before end:%i\n",l->size);
+
+   LinkedListClass.destroy(&l);
 }
 
 int main(int argc, char** argv){

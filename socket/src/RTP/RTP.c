@@ -108,7 +108,9 @@ dataBuffer rtp__send(RTP* self, Socket* sock){
 		
 		sent_size+=socket__send(sock).size-RTP_size;
 		printf("sent chunk of seq number %i :",self->sequence_number);
-		printf("%s\n",(char*)sock->send_buff->buffer+RTP_size);
+		printf("%x%x\n",
+		*(int8_t*)(sock->send_buff->buffer+RTP_size+0),
+		*(int8_t*)(sock->send_buff->buffer+RTP_size+1));
 		sock->send_buff=temp;
 		self->sequence_number++;
 	}

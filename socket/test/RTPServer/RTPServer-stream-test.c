@@ -19,12 +19,12 @@ static void start(RTPServer* self){
 	Camera* c=CameraClass.new("/dev/video0");
 
 	CameraClass.activate(c);
-	CameraClass.printSpecs(c);
+	//CameraClass.printSpecs(c);
 
 	//recv.buffer: holds *(struct sockaddr_in*) socket data of incoming request,
 	//recv.size	 : holds received message length)
 	//1. client request came to server
-	dataBuffer recvd=self->vtable->receive(self->super->super);//sock_util__receive__socket(self->super);
+	dataBuffer recvd=RTPServerClass.receive(self);//sock_util__receive__socket(self->super);
 	//parse info of client to communicate with socket
 	Socket client={ self->super->super->fd, *(struct sockaddr_in *)recvd.buffer, self->super->super->recv_buff, self->super->super->send_buff };
 
@@ -36,9 +36,11 @@ static void start(RTPServer* self){
 	cameraBuffer camBuff=CameraClass.capture(c, V4L2_PIX_FMT_JPEG);
 	//prepare acknowledgement data to send back
 
-	sock_util__buffer_write_sizei(client.send_buff, camBuff.address, camBuff.length);
-	rtp__send(self->rtp_header,	&client);
+	sock_util__buffer_write_sizei(client.send_buff, camBuff.address, 2048/*camBuff.length*/);
+	RTPServerClass.sendRTP(self,	&client);
 	
+	sock_util__buffer_write(client.send_buff, "SOCK_CLOSE_REQUEST");
+	RTPServerClass.send(/*self->rtp_header,*/ &client);
 	//dataBuffer sent=self->vtable->send(&client);//sock_util__send__socket(&client);
 	//printf("Sent (%i bytes) message: %s\n", sent.size, (char*)client.send_buff->buffer);
 	free(recvd.buffer);

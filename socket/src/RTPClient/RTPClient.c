@@ -12,7 +12,7 @@
 #include<string.h>
 
 #include "RTPClient.h"
-
+#include "PacketMonitor.h"
 
 RTPClient* rtp_client__new(int address, int port){
 	
@@ -36,4 +36,48 @@ void rtp_client__destroy(RTPClient** self){
 	(*self)=NULL;
 	
 	printf("RTPClient object destructed\n");
+}
+
+dataBuffer rtp_client__recv(RTPClient* self){
+	return socket__receive(self->super->super);
+}
+
+dataBuffer rtp_client__send(RTPClient* self){
+	return socket__send(self->super->super);
+}
+
+/*Thread to isten for messages*/
+void rtp_client__listener(RTPClient* self, LinkedList* ll){
+   
+   int done=0;
+   while ( !done ){
+
+      dataBuffer cli=socket__receive(self->super->super);
+      free(cli.buffer);
+      
+      //if sock close signal reaces
+      if ( strncmp( sock_util__buffer_get(self->super->super->recv_buff), "SOCK_CLOSE_REQUEST", 18)==0 )
+      {
+         printf("[REMOTE]:socket close request\n");
+         done=1;
+         break;
+      
+      }else{
+      
+
+         memcpy(self->rtp_header, (RTP*)self->super->super->recv_buff->buffer, sizeof(RTP));
+
+         RTP* data=rtp__new();
+
+         memcpy(data, self->rtp_header, sizeof(RTP));
+
+         PacketMonitorClass.rearrangeIncomingRTP(ll, data);
+
+         printf("rtp seq num %u |incoming: %x%x\n", 
+         self->rtp_header->sequence_number,
+         *(int8_t* )(self->super->super->recv_buff->buffer+16),
+         *(int8_t* )(self->super->super->recv_buff->buffer+17));
+      
+      }
+   }
 }

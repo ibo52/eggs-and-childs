@@ -31,7 +31,7 @@ static void start(RTPServer* self){
 	sock_util__buffer_write(client.send_buff, (char*)self->super->super->recv_buff->buffer);
 	sock_util__buffer_append(client.send_buff, "ACKNOWLEDGED."
 	"\n	ben seni sevdim içim yandı\neğer benim olmazsan \nseni herkes sevsin herkesin içi yansın\nsavrulur içimde hançer gibi hüzün \nfırlatır yüreğimi bir serseri hıçkırık\nyüreğimi yarin kirpiklerinden süzün,\nhep mi parçalanmış hep mi kırık\ngeniş aile 13. bölüm son dakikalardan bir şiir");
-	dataBuffer sent=rtp__send(self->rtp_header,	&client);
+	rtp__send(self->rtp_header,	&client);
 	
 	//dataBuffer sent=self->vtable->send(&client);//sock_util__send__socket(&client);
 	//printf("Sent (%i bytes) message: %s\n", sent.size, (char*)client.send_buff->buffer);
