@@ -15,6 +15,7 @@ struct __Node
     Node* next;
     Node* previous;
     void *data_ptr;     //void pointer to point any type of element
+    int32_t data_size;  //size of the data
 };
 
 /**

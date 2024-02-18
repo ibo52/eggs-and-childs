@@ -64,15 +64,17 @@ void rtp_client__listener(RTPClient* self, LinkedList* ll){
       
       }else{
       
-
+         //copy incoming rtp data to sesrver rtp_header
          memcpy(self->rtp_header, (RTP*)self->super->super->recv_buff->buffer, sizeof(RTP));
 
-         RTP* data=rtp__new();
-
-         memcpy(data, self->rtp_header, sizeof(RTP));
+         //copy incoming packet on another mem area
+         dataBuffer* data=sock_util__alloc_buffer(self->super->super->recv_buff->size);
+         memcpy(data->buffer, self->super->super->recv_buff->buffer, data->max_size);
+         data->size=data->max_size;
 
          PacketMonitorClass.rearrangeIncomingRTP(ll, data);
-
+         free(data);
+         
          printf("rtp seq num %u |incoming: %x%x\n", 
          self->rtp_header->sequence_number,
          *(int8_t* )(self->super->super->recv_buff->buffer+16),

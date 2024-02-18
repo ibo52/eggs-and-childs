@@ -21,6 +21,11 @@ static void start(RTPServer* self){
 	CameraClass.activate(c);
 	//CameraClass.printSpecs(c);
 
+	sock_util__dealloc_buffer(&(self->super->super->send_buff) );
+	self->super->super->send_buff=sock_util__alloc_buffer( c->buffer->length );
+
+	printf("server send buff re-alloc of size:%i\n",self->super->super->send_buff->max_size);
+
 	//recv.buffer: holds *(struct sockaddr_in*) socket data of incoming request,
 	//recv.size	 : holds received message length)
 	//1. client request came to server
@@ -35,8 +40,8 @@ static void start(RTPServer* self){
 
 	cameraBuffer camBuff=CameraClass.capture(c, V4L2_PIX_FMT_JPEG);
 	//prepare acknowledgement data to send back
-
-	sock_util__buffer_write_sizei(client.send_buff, camBuff.address, 2048/*camBuff.length*/);
+	printf("cam buff] lenght: %i\n",camBuff.length);
+	sock_util__buffer_write_sizei(client.send_buff, camBuff.address, camBuff.length);
 	RTPServerClass.sendRTP(self,	&client);
 	
 	sock_util__buffer_write(client.send_buff, "SOCK_CLOSE_REQUEST");

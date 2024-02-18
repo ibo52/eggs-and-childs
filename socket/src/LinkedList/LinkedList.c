@@ -61,8 +61,8 @@ void linked_list__append(LinkedList* self, Node* n){
 void linked_list__append_index(LinkedList* self, Node* n, int index){
 
     Node* temp=self->head;
-
-    for (int32_t i = 0; i < index; i++){
+    int32_t i;
+    for (i= 0; i < index; i++){
 
         if ( temp && temp->next ){
             
@@ -77,7 +77,7 @@ void linked_list__append_index(LinkedList* self, Node* n, int index){
     /*if the node being popped is between any two nodes
         concat that nodes to each other before popping
     */
-   printf("ll append index: temp is %s\n", temp? "not NULL":"NULL");
+   printf("ll append index:%i temp is %s\n", i, temp? "not NULL":"NULL");
    
     if(temp->previous){
 
@@ -234,7 +234,7 @@ void linked_list__print(LinkedList* self){
     int c=0;
 
     while ( temp ){
-        printf("%i~",((RTP* )temp->data_ptr)->sequence_number);
+        printf("%u~",((RTP* )temp->data_ptr)->sequence_number);
 
         if (++c %10 ==0){
             printf("\n");
