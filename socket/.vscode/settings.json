@@ -7,6 +7,9 @@
         "hash_map": "c",
         "initializer_list": "c",
         "utility": "c",
-        "socket-util.h": "c"
+        "socket-util.h": "c",
+        "cameraserver.h": "c",
+        "rtpserver.h": "c",
+        "stddef.h": "c"
     }
 }

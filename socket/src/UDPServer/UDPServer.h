@@ -4,21 +4,26 @@
 #include<stdint.h>
 #include "socket-util.h"
 /*message buffer to use on socket communication*/
-typedef struct __UDPServer_VTable UDPServer_VTable;
 
-typedef struct __UDPServer{
-	Socket* super;
-	const UDPServer_VTable* vtable;	//virtual functions table
-}UDPServer;
 
 struct __UDPServer_VTable{
+	UDPServer* (*new)(int address, int port);
+    void (*destroy)(RTSPServer** self);
+
 	dataBuffer (*receive)(Socket* self);
 	dataBuffer (*send)(Socket* self);
 	
 };
 
+typedef struct __UDPServer{
+	Socket* super;
+	const struct __UDPServer_VTable* vtable;	//virtual functions table
+}UDPServer;
+
 //static table for default virtual functions
-static const UDPServer_VTable UDPServer_VTable__default={
+static const struct __UDPServer_VTable UDPServerClass={
+	.new=udp_server__new,
+	.destroy=udp_server__destroy,
 	.receive=socket__receive,
 	.send=socket__send
 };

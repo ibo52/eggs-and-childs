@@ -38,8 +38,10 @@ static void saveToFile(LinkedList* ll){
    int RTP_PACKET_SIZE=sizeof(RTP);
 
    for(int i=1; i<ll->size; i++ ){
+      
+      size_t ss=fwrite(n->data_ptr+RTP_PACKET_SIZE, 1, n->data_size-RTP_PACKET_SIZE, fd);
 
-      fwrite(n->data_ptr+RTP_PACKET_SIZE, 1, n->data_size-RTP_PACKET_SIZE, fd);
+      printf("[FILE]: write size %lu==%u data size\n",ss, n->data_size);
       n=n->next;
    }
 

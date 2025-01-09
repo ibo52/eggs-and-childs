@@ -75,7 +75,7 @@ void rtp_client__listener(RTPClient* self, LinkedList* ll){
          PacketMonitorClass.rearrangeIncomingRTP(ll, data);
          free(data);
          
-         printf("rtp seq num %u |incoming: %x%x\n", 
+         printf("recv size:%i rtp seq num %u |incoming: %x%x\n", self->super->super->recv_buff->size,
          self->rtp_header->sequence_number,
          *(int8_t* )(self->super->super->recv_buff->buffer+16),
          *(int8_t* )(self->super->super->recv_buff->buffer+17));

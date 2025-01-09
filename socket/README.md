@@ -29,9 +29,9 @@
 1. Base socket communication [ :heavy_check_mark: ]
 2. TCP socket communication [ :heavy_check_mark: ]
 3. UDP socket communication [ :heavy_check_mark: ]
-4. RTP/UDP socket communication [ :wavy_dash: ]
-   1. Packet re-ordering on client side [ :wavy_dash: ]
-5. RTP/UDP video streaming [ :heavy_minus_sign: ]
+4. RTP/UDP socket communication [ :heavy_check_mark: ]
+   1. Packet re-ordering on client side [ :heavy_check_mark: ]
+5. RTP/UDP video streaming [ :wavy_dash: ]
 ***
 system | specs | of development|
 --- | --- | --- |

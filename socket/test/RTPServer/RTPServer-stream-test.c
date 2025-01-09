@@ -39,6 +39,7 @@ static void start(RTPServer* self){
 	(addr&0xff), (addr>>8&0xff), (addr>>16&0xff), addr>>24&0xff);	
 
 	cameraBuffer camBuff=CameraClass.capture(c, V4L2_PIX_FMT_JPEG);
+	
 	//prepare acknowledgement data to send back
 	printf("cam buff] lenght: %i\n",camBuff.length);
 	sock_util__buffer_write_sizei(client.send_buff, camBuff.address, camBuff.length);

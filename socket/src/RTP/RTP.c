@@ -85,28 +85,31 @@ void rtp__toString(RTP* self){
 	@param sock	: sender Socket to forward message to other(which also holds data to send)
 	@return		: Bytes sent in total
 */
+#include<time.h>
 dataBuffer rtp__send(RTP* self, Socket* sock){
 
 	int sent_size=0;
 	int total_data_len=sock->send_buff->size;
 
-	dataBuffer* RTPBuffer=sock_util__alloc_buffer(RTP_BYTES_PER_CHUNK);
+	dataBuffer* RTPBuffer=sock_util__alloc_buffer(UDP_MAX_BYTES_PER_CHUNK);
 	static int RTP_size=sizeof(RTP);
 
 	while(sent_size < total_data_len){
-		
-		//1. write rtp chunk
+
+		//size of data to send at current iteration
+		int currentPacketLen=min(UDP_MAX_BYTES_PER_CHUNK - RTP_size, total_data_len-sent_size);
+		//1. write rtp chunk as first (at least 16) bytes
 		memcpy(RTPBuffer->buffer, self, RTP_size);//write rtp header
 		
 		//write chunk of data to remaining space of buffer
-		memcpy(RTPBuffer->buffer + RTP_size, sock->send_buff->buffer + sent_size, RTP_BYTES_PER_CHUNK-RTP_size);
-		RTPBuffer->size=RTP_BYTES_PER_CHUNK;
+		memcpy(RTPBuffer->buffer + RTP_size, sock->send_buff->buffer + sent_size, currentPacketLen);
+		RTPBuffer->size=currentPacketLen+RTP_size;
 
 		//temporary holder for sockets buff
 		dataBuffer* temp=sock->send_buff;
 		sock->send_buff=RTPBuffer;
-		
-		sent_size+=socket__send(sock).size-RTP_size;
+
+		sent_size+=socket__send(sock).size - RTP_size;
 		printf("sent size:%i chunk, of seq number %i :", sent_size, self->sequence_number);
 		printf("%x%x\n",
 		*(int8_t*)(sock->send_buff->buffer+RTP_size+0),

@@ -15,6 +15,9 @@
 
 #define CONN_TYPE_TCP_CLIENT 2
 #define CONN_TYPE_UDP_CLIENT 3
+
+#define UDP_MAX_BYTES_PER_CHUNK 65507		//defines max chunk of bytes of UDP packets at a time. 28 bytes reserved for transport layer as MAX is 65535
+
 /*
 *
 */

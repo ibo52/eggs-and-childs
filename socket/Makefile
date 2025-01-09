@@ -3,7 +3,7 @@ TARGET=info
 
 all:info makedirs build compile_tests
 CC:=gcc
-CLIBS:=-lc -ljpeg
+CLIBS:=-lc -ljpeg -pthread
 
 BUILD_DIR:=build
 SRC_DIR:=src

@@ -5,7 +5,6 @@
 #include "Socket.h"		//Socket
 
 #define RTP_PAYLOAD_TYPE_JPEG 26
-#define RTP_BYTES_PER_CHUNK 1024		//defines chunk size( in bytes) of RTP packets
 
 //The RTP header has a minimum size of 12 bytes which is 96 bits;
 //veri yapısını yazarken paketlemeye dikkat et, bellekte boşluk doldurmalar(padding) yapmasın

@@ -100,7 +100,6 @@ dataBuffer socket__send(Socket* self){
 	@param self	: sender Socket to forward message to other
 	@return		: Bytes sent in total
 	*/
-	int MAX_BYTES_PER_SEND=65536-28;//28 bytes are allocated for udp protocol headers
 	int sent_size=0;
 	int length=self->send_buff->size;
 
@@ -110,7 +109,7 @@ dataBuffer socket__send(Socket* self){
 	while( sent_size < length ){
 	
 		int size;
-		int per_send_len=min(MAX_BYTES_PER_SEND, length-sent_size);
+		int per_send_len=min(UDP_MAX_BYTES_PER_CHUNK, length-sent_size);
 		
 		if( (size = sendto(self->fd, self->send_buff->buffer + sent_size, per_send_len, 0, (struct sockaddr *)&client, client_len)) <0 ){
 			fprintf(stderr, "Error while sending to socket(Totally %i bytes sent): %s\n",sent_size, strerror(errno));
