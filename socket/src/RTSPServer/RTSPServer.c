@@ -1,5 +1,6 @@
 #include "RTSPServer.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 RTSPServer* rtsp_server__new(int address, int port){
 

@@ -3,95 +3,110 @@
 #include <stdlib.h>
 #include "stdint.h"
 #include "stdio.h"
-
-/*
-int RTSPParser(dataBuffer* incoming){
-    char** parsed=calloc(3, sizeof(char*));
-
-    char INDEX_PARSED=0;//index of which save substring to variable 'parsed': RTSP expects 3 substring: OPTION + link + PROTOCOL
-    int32_t substrIdx=0;//index of the substings to be extracted
-
-    char* buffer = incoming->buffer;
-
-    for(int32_t index=0; index < incoming->size & INDEX_PARSED<2; index++){
-
-        if( buffer[index] == ' ' ){
-
-            parsed[INDEX_PARSED] = calloc(index-substrIdx + 1, sizeof(char));//+1 for string escape char(/0)
-            
-            memcpy(parsed[INDEX_PARSED++] , *(buffer+substrIdx), index-substrIdx);
-
-            substrIdx=index+1;
-        }
-    }
-
-    printf("PARSED: option:%s link:%s protocol:%s", parsed[0], parsed[1], parsed[2]);
-    return 0;
-}
-*/
+#include "RTSPUtils.h"
 
 
-int RTSPParser2(const char* incoming, int size){
-    char** parsed=calloc(3, sizeof(char*));
+RTSPUtils* rtsp_utils__new(){
+    RTSPUtils* self=calloc(1, sizeof(RTSPUtils));
 
-    char INDEX_PARSED=0;//index of which save substring to variable 'parsed': RTSP expects 3 substring: OPTION + link + PROTOCOL
-    int32_t substrIdx=0;//index of the substings to be extracted
+    self->TOKEN_LIST_MEM_SIZE=8;
+    self->TOKEN_MEM_SIZE=64;
 
-    char* buffer = incoming;
+    self->TOKEN_LIST=calloc(self->TOKEN_LIST_MEM_SIZE, sizeof(char*));
+    self->nextToken=calloc(self->TOKEN_MEM_SIZE+1, sizeof(char));
+    /* //have to be 0 by default since we used calloc
+    self->NUM_TOKENS=0;
+    self->nextTokenLength=0;
+    */
+    return self;
+};
 
-    int32_t index=0;
-    for(; index <= size & INDEX_PARSED<=3; index++){
+void rtsp_utils__destroy(RTSPUtils** self){
+    free( ( &(*self)->nextToken ) );
+    free( ( &(*self)->TOKEN_LIST ) );
 
-        if( buffer[index] == ' ' ){
-
-            parsed[INDEX_PARSED] = calloc(index-substrIdx + 1, sizeof(char));//+1 for string escape char(/0)
-            
-            memcpy(parsed[INDEX_PARSED] , (buffer+substrIdx), index-substrIdx);
-            
-            substrIdx=index+1;//skip empty char(' ')
-            INDEX_PARSED++;
-
-        }
-    }
-
-    printf("PARSED: option:%s\nlink:%s\nprotocol:%s\n", parsed[0], parsed[1], parsed[2]);
-    return 0;
+    (*self)=NULL;
 }
 
-int RTSPParser3(const char* incoming, int size){
-    char** BASE=calloc(3, sizeof(char*));
-    BASE[0]=calloc(16, sizeof(char));//option
-    BASE[1]=calloc(512, sizeof(char));//target link
-    BASE[2]=calloc(16, sizeof(char));//protocol/version
-
-    int8_t retval=sscanf(incoming, "%s %s %s", BASE[0], BASE[1], BASE[2]);
-
-    char* buffer=calloc(size+1, sizeof(char));
-    memcpy(buffer, incoming, size);
-    for (char* token = strchr(buffer, '\n'); token; token = strchr(NULL, '\n')){
-
-        printf("ke:%s\n",token);
-    }
-
-    if( retval < 3 ){
-        printf("Could not found required base fields. Invalid request\n");
-        return -1;
-    }
+void rtsp_utils__parse(RTSPUtils* self, const char* request, int size){
     
-    printf("PARSED: option:%s\nlink:%s\nprotocol:%s\n", BASE[0], BASE[1], BASE[2]);
+    uint8_t IN_BODY_SECTION=0;//determine if parsing reached through nody section
 
-    return 0;
+    
+    for (int32_t idx = 0; idx < size; idx++){
+
+        char nextChar = *(request+idx);
+        
+        //extract key,value of additional headers
+        if(nextChar==':' && self->NUM_TOKENS >3){
+
+            *(self->TOKEN_LIST + self->NUM_TOKENS)=calloc(self->nextTokenLength+1, sizeof(char));
+            strncpy( *(self->TOKEN_LIST + self->NUM_TOKENS++), self->nextToken, self->nextTokenLength);
+            self->nextTokenLength=0;
+            //TODO: store as key, value
+        }
+        //extract next tokens until newline
+        else if( nextChar !=' ' && nextChar!='\n' && nextChar!='\r' ){
+
+            *(self->nextToken + self->nextTokenLength++)=nextChar;
+            //self->nextTokenLength;
+            //printf("added: %c  paresed until: %s\n",nextChar, self->nextToken);
+            //realloc token memory area if token size read exceeds the current memory available
+            if( self->nextTokenLength +1 > self->TOKEN_MEM_SIZE ){
+                self->TOKEN_MEM_SIZE<<=1;//increase by 1 bit
+                self->nextToken=realloc(self->nextToken, self->TOKEN_MEM_SIZE+1);
+            }
+
+        //newline reached, store tokens and start again
+        }else if( (nextChar=' ' || nextChar=='\n') && self->nextTokenLength>0){
+            printf("token ekle:");
+            fwrite(self->nextToken,1,self->nextTokenLength,stdout);
+            printf("  len:%i  buffer:%s\n",self->nextTokenLength, self->nextToken);
+
+            *(self->TOKEN_LIST + self->NUM_TOKENS)=calloc(self->nextTokenLength+1, sizeof(char));
+            strncpy( *(self->TOKEN_LIST + self->NUM_TOKENS++), self->nextToken, self->nextTokenLength);
+            self->nextTokenLength=0;
+            //*(self->TOKEN_LIST + self->NUM_TOKENS++)=self->nextToken;
+            //realloc token list memory area if size read exceeds the current memory available
+            if( self->NUM_TOKENS+1 > self->TOKEN_LIST_MEM_SIZE ){
+                self->TOKEN_LIST_MEM_SIZE<<=1;//increase by 1 bit
+                
+                self->TOKEN_LIST=realloc(self->TOKEN_LIST, self->TOKEN_LIST_MEM_SIZE * sizeof(char*));
+            }
+
+            //if next line is also whitespace
+            //that means we reached to body section of request
+            if( (request+self->nextTokenLength+1)=="\n" ){
+                IN_BODY_SECTION=1;
+                idx+=2;
+            }
+        }
+    }
+
+}
+
+void print(RTSPUtils* self){
+printf("tokens:%i\n",self->NUM_TOKENS);
+    for (size_t i = 0; i < self->NUM_TOKENS; i++)
+    {
+        printf("token: %s\n", *(self->TOKEN_LIST +i));
+    }
+
+    printf("done\n");
+    
 }
 
 int main(int argc, char* argv){
     
-    /*
-    dataBuffer* b=sock_util__alloc_buffer(1024);
-    sock_util__buffer_write(b, "OPTIONS rtsp://example.com/media.mp4 RTSP/1.0");
-    */
-    RTSPParser3("OPTIONS rtsp://example.com/media.mp4 RTSP/1.0\nHost: example.com\n", 62);
+    RTSPUtils* u=RTSPUtilsClass.new();
+   const char* text=
+   "OPTIONS rtsp://example.com/media.mp4 RTSP/1.0\r\n"
+   "Host: example.com\r\n"
+   "header1: 123\r\n"
+   "header2: 456\r\n"
+   "\r\n"
+   "data\r\n";
+    rtsp_utils__parse(u,text, 99);
 
-
-    char* a="string1\0string2\0string3\0";
-    printf("\n1:%s\n2:%s\n3:%s\n", a, (a+8), (a+16));
+    print(u);
 }
