@@ -13,7 +13,7 @@ typedef struct __RTPServer{
 	UDPServer* super;
 	RTP* rtp_header;
 	
-	const UDPServer_VTable* vtable;	//virtual functions table
+	const struct __UDPServer_VTable* vtable;	//virtual functions table
 }RTPServer;
 
 RTPServer* rtp_server__new(int address, int port);

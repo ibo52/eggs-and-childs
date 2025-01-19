@@ -5,7 +5,6 @@
 #include "stdio.h"
 #include "RTSPUtils.h"
 
-
 RTSPUtils* rtsp_utils__new(){
     RTSPUtils* self=calloc(1, sizeof(RTSPUtils));
 
@@ -22,15 +21,15 @@ RTSPUtils* rtsp_utils__new(){
 };
 
 void rtsp_utils__destroy(RTSPUtils** self){
-    free( ( &(*self)->nextToken ) );
-    free( ( &(*self)->TOKEN_LIST ) );
+    free( ( (*self)->nextToken ) );
+    free( ( (*self)->TOKEN_LIST ) );
 
     (*self)=NULL;
 }
 
 void rtsp_utils__parse(RTSPUtils* self, const char* request, int size){
     
-    uint8_t IN_BODY_SECTION=0;//determine if parsing reached through nody section
+    //uint8_t IN_BODY_SECTION=0;//determine if parsing reached through nody section
 
     
     for (int32_t idx = 0; idx < size; idx++){
@@ -39,7 +38,7 @@ void rtsp_utils__parse(RTSPUtils* self, const char* request, int size){
         
         //extract key,value of additional headers
         if(nextChar==':' && self->NUM_TOKENS >3){
-
+            printf("added: %c  paresed until: %s\n",nextChar, self->nextToken);
             *(self->TOKEN_LIST + self->NUM_TOKENS)=calloc(self->nextTokenLength+1, sizeof(char));
             strncpy( *(self->TOKEN_LIST + self->NUM_TOKENS++), self->nextToken, self->nextTokenLength);
             self->nextTokenLength=0;
@@ -59,9 +58,9 @@ void rtsp_utils__parse(RTSPUtils* self, const char* request, int size){
 
         //newline reached, store tokens and start again
         }else if( (nextChar=' ' || nextChar=='\n') && self->nextTokenLength>0){
-            printf("token ekle:");
-            fwrite(self->nextToken,1,self->nextTokenLength,stdout);
-            printf("  len:%i  buffer:%s\n",self->nextTokenLength, self->nextToken);
+            //printf("token ekle:");
+            //fwrite(self->nextToken,1,self->nextTokenLength,stdout);
+            //printf("  len:%i  buffer:%s\n",self->nextTokenLength, self->nextToken);
 
             *(self->TOKEN_LIST + self->NUM_TOKENS)=calloc(self->nextTokenLength+1, sizeof(char));
             strncpy( *(self->TOKEN_LIST + self->NUM_TOKENS++), self->nextToken, self->nextTokenLength);
@@ -76,27 +75,23 @@ void rtsp_utils__parse(RTSPUtils* self, const char* request, int size){
 
             //if next line is also whitespace
             //that means we reached to body section of request
-            if( (request+self->nextTokenLength+1)=="\n" ){
-                IN_BODY_SECTION=1;
+            if( (request+self->nextTokenLength+1)=='\n' ){
+                //IN_BODY_SECTION=1;
                 idx+=2;
             }
         }
     }
-
 }
 
-void print(RTSPUtils* self){
+void rtsp_utils__print(RTSPUtils* self){
 printf("tokens:%i\n",self->NUM_TOKENS);
     for (size_t i = 0; i < self->NUM_TOKENS; i++)
     {
         printf("token: %s\n", *(self->TOKEN_LIST +i));
-    }
-
-    printf("done\n");
-    
+    }    
 }
-
-int main(int argc, char* argv){
+/*
+int main(int argc, char** argv){
     
     RTSPUtils* u=RTSPUtilsClass.new();
    const char* text=
@@ -108,5 +103,5 @@ int main(int argc, char* argv){
    "data\r\n";
     rtsp_utils__parse(u,text, 99);
 
-    print(u);
-}
+    rtsp_utils__print(u);
+}*/

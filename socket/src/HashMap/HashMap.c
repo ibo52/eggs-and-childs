@@ -20,6 +20,8 @@ HashMap* hashmap__new(int table_size){
     self->TABLE_SIZE=table_size;
 
     self->map=calloc(table_size, sizeof(Node*));
+
+    return self;
     
 }
 
@@ -53,6 +55,8 @@ HashMap* hashmap__put(HashMap* self, const char* key, void* value){
     *(self->map+hashIndex)=n;
 
     self->size++;
+
+    return self;
 }
 
 
@@ -66,8 +70,8 @@ void* hashmap__get(HashMap* self, const char* key){
     return value;
 }
 
-
-int main(int argc, char* argv){
+/*
+int main(int argc, char** argv){
     
     HashMap* m=hashmap__new(10);
 
@@ -81,4 +85,4 @@ int main(int argc, char* argv){
     printf("nonexist value:%s\n",v2==NULL? "NULL":"exist");
 
     hashmap__destroy(&m);
-}
+}*/

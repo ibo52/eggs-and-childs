@@ -21,7 +21,7 @@ RTPServer* rtp_server__new(int addr, int port){
 	self->rtp_header=rtp__new();
 	self->rtp_header->ssrc=addr;	//Synchronization source identiﬁer uniquely identiﬁes the source of a stream
 	
-	self->vtable=&UDPServer_VTable__default;
+	self->vtable=&UDPServerClass;
 	
 	return self;
 }

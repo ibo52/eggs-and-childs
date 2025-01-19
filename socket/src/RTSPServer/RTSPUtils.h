@@ -19,15 +19,19 @@ void rtsp_utils__parse(RTSPUtils* self,  const char* request, int);
 
 void rtsp_utils__destroy(RTSPUtils** self);
 
+void rtsp_utils__print(RTSPUtils* self);
+
 struct __RTSPUtils_VTable
 {
     RTSPUtils* (*new)(void);
     void (*destroy)(RTSPUtils** self);
     void (*parse)(RTSPUtils* self, const char* request, int size);
+    void (*print)(RTSPUtils* self);
 };
 
 const static struct __RTSPUtils_VTable RTSPUtilsClass={
     .new=rtsp_utils__new,
     .destroy=rtsp_utils__destroy,
-    .parse=rtsp_utils__parse
+    .parse=rtsp_utils__parse,
+    .print=rtsp_utils__print
 };

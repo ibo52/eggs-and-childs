@@ -1,9 +1,10 @@
 #include "UDPServer.h"
-
+#include <pthread.h>
 
 typedef struct __RTSPServer
 {
     UDPServer* super;
+    pthread_t listener_thread;
     /* data */
 }RTSPServer;
 

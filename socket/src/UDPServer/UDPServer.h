@@ -4,7 +4,6 @@
 #include<stdint.h>
 #include "socket-util.h"
 /*message buffer to use on socket communication*/
-typedef struct __UDPPServer_VTable UDPServer_VTable;
 
 typedef struct __UDPServer{
 	Socket* super;
